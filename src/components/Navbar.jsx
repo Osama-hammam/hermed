@@ -100,7 +100,7 @@ export default function Navbar() {
               className="flex items-center gap-1.5 md:gap-2.5 group focus:outline-none"
             >
               <img
-                src="/public/hermed.jpeg"
+                src="/hermed.jpeg"
                 alt="HERMED"
                 className="h-7 md:h-9 w-auto object-contain transition-opacity group-hover:opacity-80"
                 onError={(e) =>
@@ -135,7 +135,7 @@ export default function Navbar() {
               {/* Search */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all focus:outline-none"
               >
                 <MagnifyingGlassIcon className="w-5 h-5" />
               </button>
@@ -143,7 +143,7 @@ export default function Navbar() {
               {/* Wishlist */}
               <Link
                 to="/wishlist"
-                className="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                className="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all focus:outline-none"
               >
                 <HeartIcon className="w-5 h-5" />
                 {wishlistCount > 0 && (
@@ -156,7 +156,7 @@ export default function Navbar() {
               {/* Cart */}
               <Link
                 to="/cart"
-                className="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                className="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all focus:outline-none"
               >
                 <ShoppingBagIcon className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -169,7 +169,7 @@ export default function Navbar() {
               {/* User Account */}
               {isLoggedIn ? (
                 <div className="relative group">
-                  <button className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all">
+                  <button className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all focus:outline-none">
                     <UserIcon className="w-5 h-5" />
                   </button>
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -198,7 +198,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                  className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all focus:outline-none"
                 >
                   <UserIcon className="w-5 h-5" />
                 </Link>
@@ -206,7 +206,7 @@ export default function Navbar() {
 
               {/* Mobile menu */}
               <button
-                className="md:hidden p-2 text-slate-500 hover:text-brand-600 rounded-lg transition-all"
+                className="md:hidden p-2 text-slate-500 hover:text-brand-600 rounded-lg transition-all focus:outline-none"
                 onClick={() => setMenuOpen(!menuOpen)}
               >
                 {menuOpen ? (

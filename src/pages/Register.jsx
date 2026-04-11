@@ -67,7 +67,7 @@ export default function Register() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3 mb-4">
             <img
-              src="/public/hermed.jpeg"
+              src="/hermed.jpeg"
               alt="HERMED"
               className="h-14 w-auto object-contain"
               onError={(e) =>

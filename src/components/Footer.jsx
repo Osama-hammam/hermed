@@ -59,7 +59,7 @@ export default function Footer() {
               className="inline-flex items-center gap-2.5 mb-6 group"
             >
               <img
-                src="/public/hermed.jpeg"
+                src="/hermed.jpeg"
                 alt="HERMED"
                 className="h-12 w-auto object-contain transition-opacity group-hover:opacity-80"
                 onError={(e) =>

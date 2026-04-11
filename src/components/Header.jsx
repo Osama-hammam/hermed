@@ -38,7 +38,7 @@ export default function Header() {
             className="flex items-center gap-1.5 md:gap-2.5 group focus:outline-none"
           >
             <img
-              src="/public/hermed.jpeg"
+              src="/hermed.jpeg"
               alt="HERMED"
               className="h-8 md:h-10 w-auto object-contain transition-opacity group-hover:opacity-80"
               onError={(e) =>
