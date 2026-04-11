@@ -9,7 +9,6 @@ export default function Checkout() {
   const { items, clearCart } = useCartStore();
   const navigate = useNavigate();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const shipping = total === 0 ? 0 : 100;
 
   const [form, setForm] = useState({
     firstName: "",
@@ -20,7 +19,10 @@ export default function Checkout() {
     city: "",
     country: "Egypt",
     notes: "",
+    paymentMethod: "cod",
   });
+
+  const shipping = total > 0 && form.city ? 100 : 0;
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -33,6 +35,11 @@ export default function Checkout() {
     if (!form.phone.trim()) e.phone = "Required";
     if (!form.address.trim()) e.address = "Required";
     if (!form.city.trim()) e.city = "Required";
+    if (form.paymentMethod === "card") {
+      if (!form.cardNumber?.trim()) e.cardNumber = "Required";
+      if (!form.expiry?.trim()) e.expiry = "Required";
+      if (!form.cvv?.trim()) e.cvv = "Required";
+    }
     return e;
   };
 
@@ -261,26 +268,12 @@ export default function Checkout() {
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
                     Country
                   </label>
-                  <select
-                    value={form.country}
-                    onChange={(e) =>
-                      setForm({ ...form, country: e.target.value })
-                    }
-                    className="input"
-                  >
-                    {[
-                      "Egypt",
-                      "Saudi Arabia",
-                      "UAE",
-                      "Kuwait",
-                      "Qatar",
-                      "Bahrain",
-                      "Jordan",
-                      "Lebanon",
-                    ].map((c) => (
-                      <option key={c}>{c}</option>
-                    ))}
-                  </select>
+                  <input
+                    type="text"
+                    value="Egypt"
+                    disabled
+                    className="input bg-slate-50 cursor-not-allowed"
+                  />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -302,28 +295,92 @@ export default function Checkout() {
               </div>
             </div>
 
+            {/* Payment Method */}
+            <div className="bg-white rounded-2xl shadow-card p-6">
+              <h2 className="font-semibold text-slate-800 text-lg mb-5 flex items-center gap-2">
+                <span className="w-6 h-6 bg-brand-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
+                  3
+                </span>
+                Payment Method
+              </h2>
+              <div className="space-y-4">
+                <label
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${form.paymentMethod === "cod" ? "border-brand-500 bg-brand-50" : "border-slate-100 hover:border-slate-200"}`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={form.paymentMethod === "cod"}
+                    onChange={(e) =>
+                      setForm({ ...form, paymentMethod: e.target.value })
+                    }
+                    className="w-4 h-4 text-brand-600 focus:ring-brand-500"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      Cash on Delivery
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Pay with cash when your order is delivered.
+                    </p>
+                  </div>
+                </label>
+                <label
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${form.paymentMethod === "card" ? "border-brand-500 bg-brand-50" : "border-slate-100 hover:border-slate-200"}`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="card"
+                    checked={form.paymentMethod === "card"}
+                    onChange={(e) =>
+                      setForm({ ...form, paymentMethod: e.target.value })
+                    }
+                    className="w-4 h-4 text-brand-600 focus:ring-brand-500"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      Credit / Debit Card
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Securely pay using Visa, Mastercard, or Meeza.
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {form.paymentMethod === "card" && (
+                <div className="mt-6 grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl animate-fade-in">
+                  <Field
+                    label="Card Number"
+                    name="cardNumber"
+                    placeholder="0000 0000 0000 0000"
+                  />
+                  <Field
+                    label="Expiry Date"
+                    name="expiry"
+                    placeholder="MM/YY"
+                    half
+                  />
+                  <Field label="CVV" name="cvv" placeholder="123" half />
+                </div>
+              )}
+            </div>
+
             {/* Payment note */}
             <div className="bg-brand-50 border border-brand-200 rounded-2xl p-5">
               <div className="flex gap-3 items-start">
-                <div className="w-8 h-8 bg-brand-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg
-                    className="w-4 h-4 text-brand-600"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="1" y="4" width="22" height="16" rx="2" />
-                    <path d="M1 10h22" />
-                  </svg>
-                </div>
                 <div>
                   <p className="text-sm font-semibold text-brand-700">
-                    Payment on Delivery / Invoice
+                    {form.paymentMethod === "cod"
+                      ? "Payment on Delivery"
+                      : "Secure Card Payment"}
                   </p>
                   <p className="text-xs text-brand-600/80 mt-0.5">
-                    Our team will contact you to confirm payment details. We
-                    accept bank transfer, credit card, and cash on delivery.
+                    {form.paymentMethod === "cod"
+                      ? "Our team will contact you to confirm the order. Please have the exact amount ready upon delivery."
+                      : "Your transaction is encrypted and secure. We do not store your full card details on our servers."}
                   </p>
                 </div>
               </div>
@@ -370,10 +427,12 @@ export default function Checkout() {
                   <span>Shipping</span>
                   <span
                     className={
-                      shipping === 0 ? "text-emerald-600 font-medium" : ""
+                      !form.city
+                        ? "text-slate-400"
+                        : "font-medium text-slate-800"
                     }
                   >
-                    {shipping === 0 ? "FREE" : `EGP ${shipping.toFixed(2)}`}
+                    {form.city ? `EGP ${shipping.toFixed(2)}` : "Select city"}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-base text-slate-900 pt-2 border-t border-slate-100">

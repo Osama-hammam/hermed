@@ -61,7 +61,7 @@ export default function Header() {
             {/* Wishlist Link with Count */}
             <Link
               to="/wishlist"
-              className="relative p-2 text-slate-400 hover:text-brand-600 transition-colors"
+              className="relative p-2 text-slate-400 hover:text-brand-600 transition-colors focus:outline-none"
             >
               <HeartIcon className="w-6 h-6" />
               {wishlistCount > 0 && (
@@ -74,7 +74,7 @@ export default function Header() {
             {/* Cart Link with Count */}
             <Link
               to="/cart"
-              className="relative p-2 text-slate-400 hover:text-brand-600 transition-colors"
+              className="relative p-2 text-slate-400 hover:text-brand-600 transition-colors focus:outline-none"
             >
               <ShoppingBagIcon className="w-6 h-6" />
               {cartCount > 0 && (
@@ -90,7 +90,7 @@ export default function Header() {
             {isLoggedIn && user ? (
               <Link
                 to="/account"
-                className="flex items-center gap-2 p-1 pr-3 bg-slate-50 hover:bg-brand-50 rounded-full transition-all border border-slate-100 group"
+                className="flex items-center gap-2 p-1 pr-3 bg-slate-50 hover:bg-brand-50 rounded-full transition-all border border-slate-100 group focus:outline-none"
               >
                 <div className="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center group-hover:bg-brand-200 transition-colors">
                   <UserIcon className="w-4 h-4 text-brand-600" />
@@ -100,7 +100,10 @@ export default function Header() {
                 </span>
               </Link>
             ) : (
-              <Link to="/login" className="btn-primary py-2 px-5 text-sm">
+              <Link
+                to="/login"
+                className="btn-primary py-2 px-5 text-sm focus:outline-none"
+              >
                 Sign In
               </Link>
             )}
@@ -108,7 +111,7 @@ export default function Header() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+              className="md:hidden p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all focus:outline-none"
             >
               {isMenuOpen ? (
                 <XMarkIcon className="w-6 h-6" />
