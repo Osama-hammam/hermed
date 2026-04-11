@@ -11,8 +11,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import ProductCard from "../components/ProductCard";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function ProductDetail() {
+  const [detailRef, detailVisible] = useScrollAnimation();
+  const [relatedRef, relatedVisible] = useScrollAnimation();
+
   const { slug } = useParams();
   const products = useProductStore((s) => s.products);
   const product = products.find((p) => p.slug === slug);
@@ -62,7 +66,10 @@ export default function ProductDetail() {
     : null;
 
   return (
-    <div className="page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div
+      ref={detailRef}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${detailVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+    >
       <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8 flex-wrap">
         <Link to="/" className="hover:text-brand-600 transition-colors">
           Home
@@ -237,7 +244,10 @@ export default function ProductDetail() {
       </div>
 
       {related.length > 0 && (
-        <section className="mt-20">
+        <section
+          ref={relatedRef}
+          className={`mt-20 transition-all duration-700 ${relatedVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        >
           <h2 className="font-display text-2xl font-bold text-slate-900 mb-8">
             Related Products
           </h2>

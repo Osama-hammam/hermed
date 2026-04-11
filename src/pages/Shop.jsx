@@ -4,8 +4,11 @@ import { useSearchParams } from "react-router-dom";
 import { useProductStore } from "../store";
 import ProductCard from "../components/ProductCard";
 import CategorySidebar from "../components/CategorySidebar";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Shop() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const products = useProductStore((s) => s.products);
 
@@ -46,7 +49,10 @@ export default function Shop() {
   }, [products, category, search, sort]);
 
   return (
-    <div className="page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div
+      ref={contentRef}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+    >
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-slate-900">

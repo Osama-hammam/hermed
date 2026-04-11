@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../store";
 import {
   ArrowLeftIcon,
@@ -6,13 +7,30 @@ import {
   EnvelopeIcon,
   KeyIcon,
 } from "@heroicons/react/24/outline";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Account() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const { user, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState("profile");
 
   if (!user) {
-    return <div>Please log in to view your account.</div>;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="text-center animate-fade-in">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">
+            Access Denied
+          </h2>
+          <p className="text-slate-600 mb-6">
+            Please log in to view your profile and orders.
+          </p>
+          <Link to="/login" className="btn-primary">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   const handleLogout = () => {
@@ -22,7 +40,10 @@ export default function Account() {
   };
 
   return (
-    <div className="page-enter">
+    <div
+      ref={contentRef}
+      className={`page-enter transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+    >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">

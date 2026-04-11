@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Login() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,7 +16,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/account";
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -39,8 +42,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 flex items-center justify-center px-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+    <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 flex items-center justify-center px-4 py-12">
+      <div
+        ref={contentRef}
+        className={`bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -119,17 +125,6 @@ export default function Login() {
             >
               Create one
             </Link>
-          </p>
-        </div>
-
-        <div className="mt-6 p-4 bg-slate-50 rounded-xl text-xs text-slate-400">
-          <p className="font-medium text-slate-500 mb-1">Demo Account:</p>
-          <p>
-            Email:{" "}
-            <span className="font-mono text-slate-600">demo@hermed.com</span>
-          </p>
-          <p>
-            Password: <span className="font-mono text-slate-600">demo123</span>
           </p>
         </div>
       </div>

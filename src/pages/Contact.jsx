@@ -6,9 +6,14 @@ import {
   ClockIcon,
   ArrowPathIcon,
   ChatBubbleLeftRightIcon,
+  CheckBadgeIcon,
 } from "@heroicons/react/24/outline";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Contact() {
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -40,7 +45,18 @@ export default function Contact() {
   return (
     <div className="page-enter">
       {/* Header */}
-      <section className="bg-gradient-to-br from-brand-900 to-brand-600 py-20 px-4 text-center relative overflow-hidden">
+      <section
+        ref={headerRef}
+        className={`bg-gradient-to-br from-brand-900 to-brand-600 py-20 px-4 text-center relative overflow-hidden transition-all duration-700 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
+        {/* Background Image Overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <img
+            src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1600&q=80"
+            className="w-full h-full object-cover"
+            alt=""
+          />
+        </div>
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%">
             <defs>
@@ -67,7 +83,10 @@ export default function Contact() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div
+        ref={contentRef}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Info */}
           <div className="space-y-6">

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { categories, products } from "../data/products";
 import {
@@ -28,6 +29,20 @@ const categoryIcons = {
 };
 
 export default function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [
+    "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80",
+    "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1600&q=80",
+    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1600&q=80",
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   const featured = products
     .filter((p) => p.badge === "Best Seller" || p.badge === "New")
     .slice(0, 4);
@@ -43,8 +58,19 @@ export default function Home() {
       {/* ── HERO ── */}
       <section
         ref={heroRef}
-        className={`relative min-h-[88vh] flex items-center overflow-hidden bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 ${heroVisible ? "animate-fade-in-up" : "opacity-0"}`}
+        className={`relative min-h-[88vh] flex items-center overflow-hidden bg-brand-900 ${heroVisible ? "animate-fade-in-up" : "opacity-0"}`}
       >
+        {/* Hero Slider Background */}
+        {slides.map((slide, idx) => (
+          <div
+            key={idx}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentSlide === idx ? "opacity-30" : "opacity-0"}`}
+          >
+            <img src={slide} className="w-full h-full object-cover" alt="" />
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-900/80 via-brand-800/40 to-transparent" />
+          </div>
+        ))}
+
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -114,6 +140,17 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Slider Indicators */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === idx ? "bg-white w-8" : "bg-white/30 w-4 hover:bg-white/50"}`}
+              />
+            ))}
           </div>
 
           {/* Hero image card */}

@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Register() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,7 +49,7 @@ export default function Register() {
     });
 
     if (result.success) {
-      navigate("/");
+      navigate("/login");
     } else {
       setError(result.message);
     }
@@ -55,8 +58,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 flex items-center justify-center px-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+    <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 flex items-center justify-center px-4 py-12">
+      <div
+        ref={contentRef}
+        className={`bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">

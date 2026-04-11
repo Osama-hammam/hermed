@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCartStore } from "../store";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Checkout() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const { items, clearCart } = useCartStore();
   const navigate = useNavigate();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const shipping = total >= 3000 || total === 0 ? 0 : 150;
+  const shipping = total === 0 ? 0 : 100;
 
   const [form, setForm] = useState({
     firstName: "",
@@ -122,7 +125,10 @@ export default function Checkout() {
   );
 
   return (
-    <div className="page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div
+      ref={contentRef}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+    >
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-slate-900">
           Checkout
@@ -199,7 +205,58 @@ export default function Checkout() {
                   name="address"
                   placeholder="25 Medical District St."
                 />
-                <Field label="City" name="city" half placeholder="Cairo" />
+                <div className="col-span-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                    City
+                  </label>
+                  <select
+                    value={form.city}
+                    onChange={(e) => {
+                      setForm({ ...form, city: e.target.value });
+                      setErrors({ ...errors, city: "" });
+                    }}
+                    className={`input ${errors.city ? "border-red-400 ring-1 ring-red-300" : ""}`}
+                  >
+                    <option value="">Select a city...</option>
+                    {[
+                      "Cairo",
+                      "Alexandria",
+                      "Giza",
+                      "Shubra El Kheima",
+                      "Port Said",
+                      "Suez",
+                      "Luxor",
+                      "Mansoura",
+                      "Tanta",
+                      "Asyut",
+                      "Ismailia",
+                      "Fayyum",
+                      "Zagazig",
+                      "Aswan",
+                      "Damietta",
+                      "Damanhur",
+                      "Minya",
+                      "Beni Suef",
+                      "Qena",
+                      "Sohag",
+                      "6th of October",
+                      "Shibin El Kom",
+                      "Banha",
+                      "Kafr El Sheikh",
+                      "Mallawi",
+                      "10th of Ramadan",
+                    ]
+                      .sort()
+                      .map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                  </select>
+                  {errors.city && (
+                    <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+                  )}
+                </div>
                 <div className="col-span-1">
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
                     Country
@@ -316,12 +373,12 @@ export default function Checkout() {
                       shipping === 0 ? "text-emerald-600 font-medium" : ""
                     }
                   >
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : `EGP ${shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-base text-slate-900 pt-2 border-t border-slate-100">
                   <span>Total</span>
-                  <span>${(total + shipping).toFixed(2)}</span>
+                  <span>EGP {(total + shipping).toFixed(2)}</span>
                 </div>
               </div>
               <button

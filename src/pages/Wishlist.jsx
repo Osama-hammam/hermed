@@ -5,8 +5,11 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Wishlist() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const items = useWishlistStore((state) => state.items);
   const removeItem = useWishlistStore((state) => state.removeItem);
   const addItem = useCartStore((state) => state.addItem);
@@ -32,7 +35,10 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div
+      ref={contentRef}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+    >
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
           <p className="text-sm text-brand-500 uppercase tracking-[0.2em] mb-2">

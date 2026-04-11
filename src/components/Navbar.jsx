@@ -6,8 +6,9 @@ import {
   MagnifyingGlassIcon,
   ShoppingBagIcon,
   UserIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
-import { useCartStore, useAuthStore } from "../store";
+import { useCartStore, useAuthStore, useWishlistStore } from "../store";
 import { products } from "../data/products";
 
 export default function Navbar() {
@@ -16,8 +17,13 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const count = useCartStore((s) => s.count);
-  const { user, isLoggedIn, logout } = useAuthStore();
+  const cartCount = useCartStore((s) =>
+    s.items.reduce((acc, i) => acc + i.qty, 0),
+  );
+  const wishlistCount = useWishlistStore((s) => s.items.length);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const isLoggedIn = !!user;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -133,15 +139,28 @@ export default function Navbar() {
                 <MagnifyingGlassIcon className="w-5 h-5" />
               </button>
 
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+              >
+                <HeartIcon className="w-5 h-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-brand-500 text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center min-w-[18px] px-1">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
               {/* Cart */}
               <Link
                 to="/cart"
                 className="relative p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
               >
                 <ShoppingBagIcon className="w-5 h-5" />
-                {count > 0 && (
+                {cartCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-brand-500 text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center min-w-[18px] px-1">
-                    {count}
+                    {cartCount}
                   </span>
                 )}
               </Link>
@@ -219,6 +238,21 @@ export default function Navbar() {
                 {l.label}
               </NavLink>
             ))}
+            {isLoggedIn && (
+              <NavLink
+                to="/account"
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block px-4 py-2.5 rounded-lg text-sm font-medium ${
+                    isActive
+                      ? "text-brand-600 bg-brand-50"
+                      : "text-slate-600 hover:bg-slate-50"
+                  }`
+                }
+              >
+                My Account
+              </NavLink>
+            )}
           </div>
         )}
       </header>

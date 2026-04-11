@@ -6,8 +6,15 @@ import {
   MapPinIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function About() {
+  const [heroRef, heroVisible] = useScrollAnimation();
+  const [storyRef, storyVisible] = useScrollAnimation();
+  const [valuesRef, valuesVisible] = useScrollAnimation();
+  const [teamRef, teamVisible] = useScrollAnimation();
+  const [partnersRef, partnersVisible] = useScrollAnimation();
+
   const team = [
     {
       name: "Dr. Karim Mansour",
@@ -34,7 +41,18 @@ export default function About() {
   return (
     <div className="page-enter">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-900 via-brand-700 to-brand-600 py-24 px-4 text-center relative overflow-hidden">
+      <section
+        ref={heroRef}
+        className={`bg-gradient-to-br from-brand-900 via-brand-700 to-brand-600 py-24 px-4 text-center relative overflow-hidden transition-all duration-700 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
+        {/* Background Image Overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <img
+            src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1600&q=80"
+            className="w-full h-full object-cover"
+            alt=""
+          />
+        </div>
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%">
             <defs>
@@ -68,7 +86,10 @@ export default function About() {
       </section>
 
       {/* Story */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section
+        ref={storyRef}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700 ${storyVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
             <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
@@ -120,7 +141,10 @@ export default function About() {
       </section>
 
       {/* Values */}
-      <section className="bg-surface py-20">
+      <section
+        ref={valuesRef}
+        className={`bg-surface py-20 transition-all duration-700 ${valuesVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
@@ -184,7 +208,10 @@ export default function About() {
       </section>
 
       {/* Team */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section
+        ref={teamRef}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700 ${teamVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         <div className="text-center mb-12">
           <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
             The People Behind HERMED
@@ -211,7 +238,10 @@ export default function About() {
       </section>
 
       {/* Partners */}
-      <section className="bg-surface py-16">
+      <section
+        ref={partnersRef}
+        className={`bg-surface py-16 transition-all duration-700 ${partnersVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-slate-400 text-sm font-medium tracking-widest uppercase mb-8">
             Authorized Distributor For

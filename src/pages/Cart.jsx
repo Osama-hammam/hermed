@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import { useCartStore } from "../store";
 import { ShoppingBagIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Cart() {
+  const [contentRef, contentVisible] = useScrollAnimation();
+
   const { items, removeItem, updateQty } = useCartStore();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const shipping = total >= 3000 || total === 0 ? 0 : 150;
+  const shipping = total === 0 ? 0 : 100;
 
   if (items.length === 0) {
     return (
@@ -28,7 +31,10 @@ export default function Cart() {
   }
 
   return (
-    <div className="page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div
+      ref={contentRef}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+    >
       <h1 className="font-display text-3xl font-bold text-slate-900 mb-8">
         Shopping Cart
       </h1>
@@ -122,14 +128,9 @@ export default function Cart() {
                       : "font-medium text-slate-800"
                   }
                 >
-                  {shipping === 0 ? "FREE" : `EGP ${shipping.toFixed(2)}`}
+                    EGP {shipping.toFixed(2)}
                 </span>
               </div>
-              {shipping > 0 && (
-                <p className="text-xs text-brand-500 bg-brand-50 rounded-lg p-2">
-                  Add EGP {(3000 - total).toFixed(2)} more for free shipping!
-                </p>
-              )}
               <div className="border-t border-slate-100 pt-3 flex justify-between font-bold text-base text-slate-900">
                 <span>Total</span>
                 <span>EGP {(total + shipping).toFixed(2)}</span>
