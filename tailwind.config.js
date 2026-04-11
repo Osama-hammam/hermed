@@ -20,8 +20,9 @@ export default {
         surface: "#f8fafc",
       },
       fontFamily: {
-        display: ["'Playfair Display'", "serif"],
-        body: ["'DM Sans'", "sans-serif"],
+        sans: ["'Inter'", "system-ui", "sans-serif"],
+        display: ["'Inter'", "system-ui", "sans-serif"],
+        body: ["'Inter'", "system-ui", "sans-serif"],
       },
       boxShadow: {
         card: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(37,99,235,0.08)",

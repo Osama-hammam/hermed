@@ -135,15 +135,24 @@ export default function Shop() {
                   setSearch("");
                   setCategory("");
                 }}
-                className="btn-secondary"
+                className="btn-secondary hover:bg-slate-100 active:scale-[0.98] transition-all"
               >
                 Clear Filters
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filtered.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {filtered.map((p, index) => (
+                <div
+                  key={p.id}
+                  className={`${contentVisible ? `animate-fade-in-up` : "opacity-0"}`}
+                  style={{
+                    animationDelay: `${(index % 6) * 100}ms`,
+                    animationFillMode: "forwards",
+                  }}
+                >
+                  <ProductCard product={p} />
+                </div>
               ))}
             </div>
           )}

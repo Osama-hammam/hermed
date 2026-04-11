@@ -5,6 +5,7 @@ import {
   EnvelopeIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 function FacebookIcon(props) {
   return (
@@ -42,28 +43,32 @@ function LinkedInIcon(props) {
 }
 
 export default function Footer() {
+  const [footerRef, footerVisible] = useScrollAnimation();
+
   return (
-    <footer className="bg-slate-900 text-slate-300 mt-24">
+    <footer
+      ref={footerRef}
+      className={`bg-slate-900 text-slate-300 mt-24 transition-all duration-1000 ease-out ${footerVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
           {/* Brand */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
-                <span className="text-white text-base font-bold font-display">
-                  H
-                </span>
-              </div>
-              <div>
-                <span className="font-display font-bold text-xl text-white">
-                  HERMED
-                </span>
-                <div className="text-[9px] text-slate-500 tracking-widest uppercase -mt-0.5">
-                  Dental Supplies
-                </div>
-              </div>
-            </div>
-            <p className="text-sm text-slate-400 leading-relaxed mb-4">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2.5 mb-6 group"
+            >
+              <img
+                src="/public/hermed.jpeg"
+                alt="HERMED"
+                className="h-12 w-auto object-contain transition-opacity group-hover:opacity-80"
+                onError={(e) =>
+                  (e.target.src =
+                    "https://ui-avatars.com/api/?name=HERMED&background=1d4ed8&color=fff")
+                }
+              />
+            </Link>
+            <p className="text-sm text-slate-300 leading-relaxed mb-6 max-w-xs">
               Your trusted partner for premium dental supplies, serving dental
               professionals across the Middle East since 2010.
             </p>
@@ -94,10 +99,10 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm tracking-wide">
+            <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-widest opacity-90">
               Quick Links
             </h4>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3.5 text-sm">
               {[
                 { to: "/shop", label: "Shop All" },
                 { to: "/about", label: "About Us" },
@@ -107,7 +112,7 @@ export default function Footer() {
                 <li key={l.to}>
                   <Link
                     to={l.to}
-                    className="hover:text-white hover:translate-x-1 inline-block transition-all text-slate-400"
+                    className="hover:text-white hover:translate-x-1 inline-block transition-all text-slate-300"
                   >
                     {l.label}
                   </Link>
@@ -118,10 +123,10 @@ export default function Footer() {
 
           {/* Categories */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm tracking-wide">
+            <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-widest opacity-90">
               Categories
             </h4>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3.5 text-sm">
               {[
                 "Handpieces",
                 "Instruments",
@@ -133,7 +138,7 @@ export default function Footer() {
                 <li key={c}>
                   <Link
                     to={`/shop?category=${c.toLowerCase().replace(/ & /g, "-")}`}
-                    className="hover:text-white inline-block transition-colors text-slate-400"
+                    className="hover:text-white inline-block transition-colors text-slate-300"
                   >
                     {c}
                   </Link>
@@ -144,10 +149,10 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm tracking-wide">
+            <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-widest opacity-90">
               Contact Us
             </h4>
-            <ul className="space-y-3 text-sm text-slate-400">
+            <ul className="space-y-4 text-sm text-slate-300">
               <li className="flex gap-2.5 items-start">
                 <MapPinIcon className="w-5 h-5 text-brand-500 flex-shrink-0" />
                 <span>25 Medical District St., Cairo, Egypt 11311</span>
@@ -178,7 +183,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-slate-500">
+        <div className="border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-slate-400">
           <p>
             © {new Date().getFullYear()} HERMED Dental Supplies. All rights
             reserved.

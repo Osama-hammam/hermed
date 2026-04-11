@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuthStore, useCartStore, useWishlistStore } from "../store";
 import {
@@ -11,6 +11,14 @@ import {
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const user = useAuthStore((s) => s.user);
   const isLoggedIn = !!user;
   const cartCount = useCartStore((s) =>
@@ -19,19 +27,25 @@ export default function Header() {
   const wishlistCount = useWishlistStore((s) => s.items.length);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/70 backdrop-blur-lg border-b border-white/20 shadow-lg py-1" : "bg-white border-b border-slate-100 py-0"}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 bg-brand-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
-              <span className="text-white text-xl font-bold font-display">
-                H
-              </span>
-            </div>
-            <span className="font-display text-2xl font-bold text-slate-900 tracking-tight">
-              HERMED
-            </span>
+          <Link
+            to="/"
+            className="flex items-center gap-1.5 md:gap-2.5 group focus:outline-none"
+          >
+            <img
+              src="/public/hermed.jpeg"
+              alt="HERMED"
+              className="h-8 md:h-10 w-auto object-contain transition-opacity group-hover:opacity-80"
+              onError={(e) =>
+                (e.target.src =
+                  "https://ui-avatars.com/api/?name=HERMED&background=1d4ed8&color=fff")
+              }
+            />
           </Link>
 
           {/* Nav */}
@@ -102,7 +116,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/login"
-                className="btn-primary py-2 px-5 text-sm focus:outline-none"
+                className="btn-primary py-2 px-5 text-sm focus:outline-none hover:opacity-90 active:scale-[0.98] transition-all"
               >
                 Sign In
               </Link>

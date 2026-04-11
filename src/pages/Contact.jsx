@@ -47,7 +47,7 @@ export default function Contact() {
       {/* Header */}
       <section
         ref={headerRef}
-        className={`bg-gradient-to-br from-brand-900 to-brand-600 py-20 px-4 text-center relative overflow-hidden transition-all duration-700 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`bg-gradient-to-br from-brand-900 to-brand-600 py-20 px-4 text-center relative overflow-hidden transition-all duration-1000 ${headerVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         {/* Background Image Overlay */}
         <div className="absolute inset-0 opacity-20">
@@ -85,7 +85,7 @@ export default function Contact() {
 
       <div
         ref={contentRef}
-        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 transition-all duration-1000 ${contentVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Info */}
@@ -164,7 +164,7 @@ export default function Contact() {
                     setSent(false);
                     setForm({ name: "", email: "", subject: "", message: "" });
                   }}
-                  className="btn-secondary"
+                  className="btn-secondary hover:bg-slate-100 active:scale-[0.98] transition-all"
                 >
                   Send Another Message
                 </button>
@@ -259,7 +259,7 @@ export default function Contact() {
                 </div>
                 <button
                   type="submit"
-                  className="btn-primary text-base px-8 py-3"
+                  className="btn-primary text-base px-8 py-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-md"
                 >
                   Send Message
                 </button>

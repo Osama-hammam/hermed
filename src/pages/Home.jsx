@@ -98,17 +98,13 @@ export default function Home() {
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
               Trusted by 2,000+ dental professionals
             </div>
-            <h1 className="font-display text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6">
-              Premium Dental
-              <br />
-              <span className="text-brand-200">Supplies</span> for
-              <br />
-              Professionals
+            <h1 className="font-bold text-4xl md:text-6xl mb-4 whitespace-pre-line animate-fade-in text-white leading-snug">
+              Delivering Dental{"\n"}
+              <span className="text-brand-200">Excellence</span>
             </h1>
             <p className="text-brand-100/80 text-lg leading-relaxed mb-10 max-w-md">
-              HERMED brings world-class dental equipment, instruments, and
-              materials straight to your clinic. Certified products, fast
-              delivery, competitive pricing.
+              Premium dental instruments, equipment, and supplies for
+              professionals who demand the best
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -133,7 +129,7 @@ export default function Home() {
                 ["15+", "Years Experience"],
               ].map(([n, l]) => (
                 <div key={l}>
-                  <div className="text-2xl font-bold text-white font-display">
+                  <div className="text-2xl font-bold text-white">
                     {n}
                   </div>
                   <div className="text-xs text-brand-200/70 mt-0.5">{l}</div>
@@ -203,7 +199,7 @@ export default function Home() {
           <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
             Browse By
           </span>
-          <h2 className="font-display text-3xl font-bold text-slate-900 mt-2">
+          <h2 className="text-3xl font-bold text-slate-900 mt-2">
             Product Categories
           </h2>
         </div>
@@ -240,7 +236,7 @@ export default function Home() {
               <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
                 Hand-Picked
               </span>
-              <h2 className="font-display text-3xl font-bold text-slate-900 mt-2">
+              <h2 className="text-3xl font-bold text-slate-900 mt-2">
                 Featured Products
               </h2>
             </div>
@@ -281,7 +277,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 bg-white/10 text-white text-xs font-medium px-3 py-1.5 rounded-full mb-4 border border-white/20">
               <SparklesIcon className="w-4 h-4" /> Limited Time Offer
             </div>
-            <h2 className="font-display text-3xl lg:text-4xl font-bold text-white mb-3">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-3">
               Save 15% on Your First Order
             </h2>
             <p className="text-brand-100/80 text-base max-w-md">

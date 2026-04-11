@@ -43,7 +43,7 @@ export default function About() {
       {/* Hero */}
       <section
         ref={heroRef}
-        className={`bg-gradient-to-br from-brand-900 via-brand-700 to-brand-600 py-24 px-4 text-center relative overflow-hidden transition-all duration-700 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`bg-gradient-to-br from-brand-900 via-brand-700 to-brand-600 py-24 px-4 text-center relative overflow-hidden transition-all duration-1000 ${heroVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         {/* Background Image Overlay */}
         <div className="absolute inset-0 opacity-20">
@@ -72,7 +72,7 @@ export default function About() {
           <span className="badge bg-white/10 text-white border border-white/20 mb-4">
             About HERMED
           </span>
-          <h1 className="font-display text-4xl lg:text-5xl font-bold text-white mb-5 mt-3">
+          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-5 mt-3">
             Supplying Excellence to
             <br />
             Dental Professionals
@@ -88,14 +88,14 @@ export default function About() {
       {/* Story */}
       <section
         ref={storyRef}
-        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700 ${storyVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-1000 ${storyVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
             <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
               Our Story
             </span>
-            <h2 className="font-display text-3xl font-bold text-slate-900 mt-2 mb-6">
+            <h2 className="text-3xl font-bold text-slate-900 mt-2 mb-6">
               Founded by Dentists, For Dentists
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
@@ -130,7 +130,7 @@ export default function About() {
                 key={s.l}
                 className="bg-white rounded-2xl p-6 shadow-card text-center border border-slate-50"
               >
-                <div className="font-display text-3xl font-bold text-brand-600 mb-1">
+                <div className="text-3xl font-bold text-brand-600 mb-1">
                   {s.n}
                 </div>
                 <div className="text-sm text-slate-500">{s.l}</div>
@@ -143,14 +143,14 @@ export default function About() {
       {/* Values */}
       <section
         ref={valuesRef}
-        className={`bg-surface py-20 transition-all duration-700 ${valuesVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`bg-surface py-20 transition-all duration-1000 ${valuesVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
               What We Stand For
             </span>
-            <h2 className="font-display text-3xl font-bold text-slate-900 mt-2">
+            <h2 className="text-3xl font-bold text-slate-900 mt-2">
               Our Core Values
             </h2>
           </div>
@@ -210,13 +210,13 @@ export default function About() {
       {/* Team */}
       <section
         ref={teamRef}
-        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700 ${teamVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-1000 ${teamVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         <div className="text-center mb-12">
           <span className="text-brand-500 text-sm font-medium tracking-widest uppercase">
             The People Behind HERMED
           </span>
-          <h2 className="font-display text-3xl font-bold text-slate-900 mt-2">
+          <h2 className="text-3xl font-bold text-slate-900 mt-2">
             Meet Our Team
           </h2>
         </div>
@@ -240,7 +240,7 @@ export default function About() {
       {/* Partners */}
       <section
         ref={partnersRef}
-        className={`bg-surface py-16 transition-all duration-700 ${partnersVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+        className={`bg-surface py-16 transition-all duration-1000 ${partnersVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-slate-400 text-sm font-medium tracking-widest uppercase mb-8">

@@ -49,14 +49,18 @@ export default function Login() {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-white text-2xl font-bold font-display">
-              H
-            </span>
-          </div>
-          <h1 className="font-display text-2xl font-bold text-slate-900">
-            Welcome Back
-          </h1>
+          <Link to="/" className="inline-flex items-center gap-3 mb-4">
+            <img
+              src="/public/hermed.jpeg"
+              alt="HERMED"
+              className="h-14 w-auto object-contain"
+              onError={(e) =>
+                (e.target.src =
+                  "https://ui-avatars.com/api/?name=HERMED&background=1d4ed8&color=fff")
+              }
+            />
+          </Link>
+          <h1 className="text-2xl font-bold text-slate-900">Welcome Back</h1>
           <p className="text-slate-400 text-sm mt-1">
             Sign in to your HERMED account
           </p>

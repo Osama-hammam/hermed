@@ -68,15 +68,15 @@ export default function ProductCard({ product }) {
       </Link>
 
       <div className="p-5">
-        <p className="text-[10px] font-bold text-brand-500 uppercase tracking-widest mb-1.5">
-          {product.category}
-        </p>
         <Link
           to={`/product/${product.slug}`}
-          className="block font-display font-bold text-slate-800 hover:text-brand-600 transition-colors mb-2 line-clamp-1"
+          className="block font-bold text-black hover:text-brand-600 transition-colors mb-1 line-clamp-2 text-lg md:text-base"
         >
           {product.name}
         </Link>
+        <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">
+          {product.category}
+        </p>
 
         <div className="flex items-center justify-between mt-4">
           <div className="flex flex-col">

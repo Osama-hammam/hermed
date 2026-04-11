@@ -81,7 +81,9 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-sm shadow-nav" : "bg-white"
+          scrolled
+            ? "bg-white/70 backdrop-blur-lg shadow-lg border-b border-white/20"
+            : "bg-white"
         }`}
       >
         {/* Top strip */}
@@ -93,20 +95,19 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-brand-700 transition-colors">
-                <span className="text-white text-base font-bold font-display">
-                  H
-                </span>
-              </div>
-              <div>
-                <span className="font-display font-bold text-xl text-brand-700 tracking-tight">
-                  HERMED
-                </span>
-                <div className="text-[9px] text-slate-400 font-medium tracking-widest uppercase -mt-0.5">
-                  Dental Supplies
-                </div>
-              </div>
+            <Link
+              to="/"
+              className="flex items-center gap-1.5 md:gap-2.5 group focus:outline-none"
+            >
+              <img
+                src="/public/hermed.jpeg"
+                alt="HERMED"
+                className="h-7 md:h-9 w-auto object-contain transition-opacity group-hover:opacity-80"
+                onError={(e) =>
+                  (e.target.src =
+                    "https://ui-avatars.com/api/?name=HERMED&background=1d4ed8&color=fff")
+                }
+              />
             </Link>
 
             {/* Desktop Nav */}

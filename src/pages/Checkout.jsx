@@ -86,10 +86,16 @@ export default function Checkout() {
           </strong>
         </div>
         <div className="flex gap-4 justify-center">
-          <Link to="/shop" className="btn-primary">
+          <Link
+            to="/shop"
+            className="btn-primary hover:opacity-90 active:scale-[0.98] transition-all"
+          >
             Continue Shopping
           </Link>
-          <Link to="/" className="btn-secondary">
+          <Link
+            to="/"
+            className="btn-secondary hover:bg-slate-100 active:scale-[0.98] transition-all"
+          >
             Go Home
           </Link>
         </div>
@@ -103,7 +109,10 @@ export default function Checkout() {
         <h2 className="font-display text-2xl font-bold text-slate-800 mb-3">
           Your cart is empty
         </h2>
-        <Link to="/shop" className="btn-primary">
+        <Link
+          to="/shop"
+          className="btn-primary hover:opacity-90 active:scale-[0.98] transition-all"
+        >
           Shop Now
         </Link>
       </div>
@@ -407,7 +416,7 @@ export default function Checkout() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-700 truncate">
+                      <p className="text-base md:text-sm font-bold text-black truncate">
                         {item.name}
                       </p>
                       <p className="text-xs text-slate-400">Qty: {item.qty}</p>
@@ -442,7 +451,7 @@ export default function Checkout() {
               </div>
               <button
                 type="submit"
-                className="btn-primary w-full text-center text-base py-3.5 rounded-xl mt-5"
+                className="btn-primary w-full text-center text-base py-3.5 rounded-xl mt-5 hover:opacity-90 active:scale-[0.98] transition-all shadow-md hover:shadow-lg"
               >
                 Place Order
               </button>

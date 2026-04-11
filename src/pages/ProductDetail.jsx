@@ -35,13 +35,16 @@ export default function ProductDetail() {
         <div className="mx-auto w-20 h-20 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
           <XMarkIcon className="w-10 h-10" />
         </div>
-        <h2 className="font-display text-2xl font-bold text-slate-800 mb-2">
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">
           Product Not Found
         </h2>
         <p className="text-slate-500 mb-6">
           This product may have been removed or the URL is incorrect.
         </p>
-        <Link to="/shop" className="btn-primary">
+        <Link
+          to="/shop"
+          className="btn-primary hover:opacity-90 active:scale-[0.98] transition-all"
+        >
           Back to Shop
         </Link>
       </div>
@@ -68,7 +71,7 @@ export default function ProductDetail() {
   return (
     <div
       ref={detailRef}
-      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${detailVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-1000 ${detailVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
     >
       <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8 flex-wrap">
         <Link to="/" className="hover:text-brand-600 transition-colors">
@@ -131,7 +134,7 @@ export default function ProductDetail() {
             </button>
           </div>
 
-          <h1 className="font-display text-3xl font-bold text-slate-900 mb-4 leading-tight">
+          <h1 className="text-3xl font-bold text-slate-900 mb-4 leading-snug">
             {product.name}
           </h1>
 
@@ -153,7 +156,7 @@ export default function ProductDetail() {
           </div>
 
           <div className="flex items-baseline gap-3 mb-6">
-            <span className="font-display text-4xl font-bold text-slate-900">
+            <span className="text-4xl font-bold text-slate-900">
               EGP {product.price.toFixed(2)}
             </span>
             {product.originalPrice && (
@@ -246,14 +249,23 @@ export default function ProductDetail() {
       {related.length > 0 && (
         <section
           ref={relatedRef}
-          className={`mt-20 transition-all duration-700 ${relatedVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          className={`mt-20 transition-all duration-1000 ${relatedVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
         >
-          <h2 className="font-display text-2xl font-bold text-slate-900 mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8">
             Related Products
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {related.map((p, index) => (
+              <div
+                key={p.id}
+                className={`${relatedVisible ? "animate-fade-in-up" : "opacity-0"}`}
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: "forwards",
+                }}
+              >
+                <ProductCard product={p} />
+              </div>
             ))}
           </div>
         </section>

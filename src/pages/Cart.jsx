@@ -23,7 +23,10 @@ export default function Cart() {
           Browse our catalog of professional dental supplies and add items to
           get started.
         </p>
-        <Link to="/shop" className="btn-primary text-base">
+        <Link
+          to="/shop"
+          className="btn-primary text-base hover:opacity-90 active:scale-[0.98] transition-all"
+        >
           Start Shopping
         </Link>
       </div>
@@ -65,7 +68,7 @@ export default function Cart() {
                     </p>
                     <Link
                       to={`/product/${item.slug}`}
-                      className="font-semibold text-slate-800 hover:text-brand-600 transition-colors line-clamp-2 text-sm"
+                      className="font-bold text-black hover:text-brand-600 transition-colors line-clamp-2 text-base md:text-sm"
                     >
                       {item.name}
                     </Link>
@@ -128,7 +131,7 @@ export default function Cart() {
                       : "font-medium text-slate-800"
                   }
                 >
-                    EGP {shipping.toFixed(2)}
+                  EGP {shipping.toFixed(2)}
                 </span>
               </div>
               <div className="border-t border-slate-100 pt-3 flex justify-between font-bold text-base text-slate-900">
@@ -139,13 +142,13 @@ export default function Cart() {
 
             <Link
               to="/checkout"
-              className="btn-primary w-full text-center block text-base py-3.5 rounded-xl"
+              className="btn-primary w-full text-center block text-base py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-md hover:shadow-lg"
             >
               Proceed to Checkout
             </Link>
             <Link
               to="/shop"
-              className="btn-ghost w-full text-center block mt-3 text-sm"
+              className="btn-ghost w-full text-center block mt-3 text-sm hover:bg-slate-50 transition-all rounded-lg py-2"
             >
               Continue Shopping
             </Link>
@@ -159,7 +162,7 @@ export default function Cart() {
                   placeholder="HERMED15"
                   className="input text-sm flex-1"
                 />
-                <button className="btn-secondary text-sm px-4 py-2">
+                <button className="btn-secondary text-sm px-4 py-2 hover:bg-slate-800 hover:text-white active:scale-[0.98] transition-all">
                   Apply
                 </button>
               </div>
