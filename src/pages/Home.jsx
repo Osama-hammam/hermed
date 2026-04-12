@@ -139,9 +139,7 @@ export default function Home() {
                 ["15+", "Years Experience"],
               ].map(([n, l]) => (
                 <div key={l}>
-                  <div className="text-2xl font-bold text-white">
-                    {n}
-                  </div>
+                  <div className="text-2xl font-bold text-white">{n}</div>
                   <div className="text-xs text-brand-200/70 mt-0.5">{l}</div>
                 </div>
               ))}
@@ -314,7 +312,7 @@ export default function Home() {
       </section>
 
       {/* ── WHY HERMED ── */}
-      <section className="bg-surface py-16">
+      <section ref={featuresRef} className="bg-surface py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[

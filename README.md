@@ -11,16 +11,7 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173)
 
-## 🔑 Admin Access
-
-Navigate to `/admin` or `/admin/login`
-
-| Field | Value |
-|-------|-------|
-| Email | `admin@hermed.com` |
-| Password | `hermed2024` |
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -61,6 +52,7 @@ src/
 ## ✨ Features
 
 ### Store
+
 - Browse 12 mock products across 8 categories
 - Filter by category, search by name/description, sort by price/rating
 - Product detail pages with image gallery, features, and related products
@@ -69,6 +61,7 @@ src/
 - Promo code UI (ready for backend)
 
 ### Admin Panel
+
 - Protected routes (fake JWT-style auth via Zustand + localStorage)
 - Dashboard with stats and recent activity
 - Products: full add/edit/delete with modal form
