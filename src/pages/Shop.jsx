@@ -90,11 +90,11 @@ export default function Shop() {
   return (
     <div
       ref={contentRef}
-      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 md:translate-y-10"}`}
     >
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-slate-900">
+      <div className="mb-6 md:mb-8">
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-slate-900">
           Shop All Products
         </h1>
         <p className="text-slate-500 mt-1">
@@ -102,7 +102,7 @@ export default function Shop() {
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
         {/* Sidebar */}
         <div className="lg:w-64 flex-shrink-0">
           <CategorySidebar
@@ -115,7 +115,7 @@ export default function Shop() {
         {/* Main */}
         <div className="flex-1 min-w-0">
           {/* Toolbar */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4 mb-6">
             <div className="relative flex-1">
               <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -129,7 +129,7 @@ export default function Shop() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="input md:w-48 h-12 md:h-auto"
+              className="input md:w-48 h-11 md:h-auto text-sm"
             >
               <option value="default">Sort: Default</option>
               <option value="price-asc">Price: Low → High</option>
@@ -182,7 +182,7 @@ export default function Shop() {
           ) : (
             <div
               key={page}
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"
+              className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5"
             >
               {paginated.map((p, index) => (
                 <div
