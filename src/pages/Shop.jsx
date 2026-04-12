@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useProductStore } from "../store";
 import ProductCard from "../components/ProductCard";
 import CategorySidebar from "../components/CategorySidebar";
+import Pagination from "./Pagination";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Shop() {
@@ -16,12 +17,31 @@ export default function Shop() {
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [sort, setSort] = useState("default");
 
+  const page = useMemo(() => {
+    const p = parseInt(searchParams.get("page") || "1", 10);
+    return isNaN(p) || p < 1 ? 1 : p;
+  }, [searchParams]);
+  const itemsPerPage = 20;
+
   useEffect(() => {
-    const params = {};
-    if (search) params.search = search;
-    if (category) params.category = category;
-    setSearchParams(params, { replace: true });
-  }, [search, category]);
+    const isSearchDiff = search !== (searchParams.get("search") || "");
+    const isCategoryDiff = category !== (searchParams.get("category") || "");
+
+    if (isSearchDiff || isCategoryDiff) {
+      setSearchParams(
+        (prev) => {
+          const p = new URLSearchParams(prev);
+          if (search) p.set("search", search);
+          else p.delete("search");
+          if (category) p.set("category", category);
+          else p.delete("category");
+          p.set("page", "1");
+          return p;
+        },
+        { replace: true },
+      );
+    }
+  }, [search, category, searchParams, setSearchParams]);
 
   const categoryCounts = useMemo(() => {
     const counts = { all: products.length };
@@ -48,10 +68,29 @@ export default function Shop() {
     return list;
   }, [products, category, search, sort]);
 
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, page]);
+
+  const handlePageChange = (p) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("page", p.toString());
+        return next;
+      },
+      { replace: true },
+    );
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div
       ref={contentRef}
-      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
     >
       {/* Header */}
       <div className="mb-8">
@@ -76,7 +115,7 @@ export default function Shop() {
         {/* Main */}
         <div className="flex-1 min-w-0">
           {/* Toolbar */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -90,7 +129,7 @@ export default function Shop() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="input sm:w-48"
+              className="input md:w-48 h-12 md:h-auto"
             >
               <option value="default">Sort: Default</option>
               <option value="price-asc">Price: Low → High</option>
@@ -141,8 +180,11 @@ export default function Shop() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filtered.map((p, index) => (
+            <div
+              key={page}
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"
+            >
+              {paginated.map((p, index) => (
                 <div
                   key={p.id}
                   className={`${contentVisible ? `animate-fade-in-up` : "opacity-0"}`}
@@ -156,6 +198,12 @@ export default function Shop() {
               ))}
             </div>
           )}
+
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </div>

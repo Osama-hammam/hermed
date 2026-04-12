@@ -180,7 +180,7 @@ export default function ProductDetail() {
               <h3 className="font-semibold text-slate-800 mb-3">
                 Key Features
               </h3>
-              <ul className="grid grid-cols-2 gap-2">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {product.features.map((f) => (
                   <li
                     key={f}
@@ -199,7 +199,7 @@ export default function ProductDetail() {
           </p>
 
           {product.inStock ? (
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setQty(Math.max(1, qty - 1))}
