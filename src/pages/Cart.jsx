@@ -45,10 +45,14 @@ export default function Cart() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Items */}
         <div className="lg:col-span-2 space-y-4">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl shadow-card p-4 md:p-5 flex flex-row gap-4 md:gap-5"
+              className={`bg-white rounded-2xl shadow-card p-4 md:p-5 flex flex-row gap-4 md:gap-5 ${contentVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animationFillMode: "forwards",
+              }}
             >
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-slate-50 flex-shrink-0">
                 <img
@@ -108,7 +112,10 @@ export default function Cart() {
         </div>
 
         {/* Summary */}
-        <div>
+        <div
+          className={`${contentVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+          style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
+        >
           <div className="bg-white rounded-2xl shadow-card p-6 sticky top-24">
             <h2 className="font-semibold text-slate-800 text-lg mb-5">
               Order Summary

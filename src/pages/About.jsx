@@ -186,12 +186,13 @@ export default function About() {
                 title: "Sustainable Practices",
                 desc: "We prioritize eco-friendly packaging and work with suppliers who share our commitment to sustainability.",
               },
-            ].map((v) => {
+            ].map((v, index) => {
               const ValueIcon = v.icon;
               return (
                 <div
                   key={v.title}
-                  className="bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-shadow border border-slate-50"
+                  className={`bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover border border-slate-50 transition-all duration-700 ${valuesVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   <ValueIcon className="w-6 h-6 text-brand-600 block mb-4" />
                   <h3 className="font-semibold text-slate-800 mb-2">
@@ -221,8 +222,12 @@ export default function About() {
           </h2>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {team.map((m) => (
-            <div key={m.name} className="text-center group">
+          {team.map((m, index) => (
+            <div
+              key={m.name}
+              className={`text-center group transition-all duration-700 ${teamVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+              style={{ transitionDelay: `${index * 100}ms` }}
+            >
               <div className="w-24 h-24 rounded-2xl overflow-hidden mx-auto mb-4 shadow-card group-hover:shadow-card-hover transition-shadow">
                 <img
                   src={m.img}

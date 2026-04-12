@@ -94,19 +94,27 @@ export default function Home() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-xs font-medium px-3 py-1.5 rounded-full mb-6 border border-white/20">
+            <div
+              className={`inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-xs font-medium px-3 py-1.5 rounded-full mb-6 border border-white/20 transition-all duration-1000 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+            >
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
               Trusted by 2,000+ dental professionals
             </div>
-            <h1 className="font-bold text-4xl md:text-6xl mb-4 whitespace-pre-line animate-fade-in text-white leading-snug">
+            <h1
+              className={`font-bold text-4xl md:text-6xl mb-4 whitespace-pre-line text-white leading-snug transition-all duration-1000 delay-100 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            >
               Delivering Dental{"\n"}
               <span className="text-brand-200">Excellence</span>
             </h1>
-            <p className="text-brand-100/80 text-lg leading-relaxed mb-10 max-w-md">
+            <p
+              className={`text-brand-100/80 text-lg leading-relaxed mb-10 max-w-md transition-all duration-1000 delay-200 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            >
               Premium dental instruments, equipment, and supplies for
               professionals who demand the best
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div
+              className={`flex flex-wrap gap-4 transition-all duration-1000 delay-300 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            >
               <Link
                 to="/shop"
                 className="bg-white text-brand-700 hover:bg-brand-50 font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
@@ -122,7 +130,9 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div className="mt-14 flex gap-10">
+            <div
+              className={`mt-14 flex gap-10 transition-all duration-1000 delay-500 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            >
               {[
                 ["2,000+", "Clinics Served"],
                 ["500+", "Products"],
@@ -150,7 +160,9 @@ export default function Home() {
           </div>
 
           {/* Hero image card */}
-          <div className="hidden lg:flex justify-end">
+          <div
+            className={`hidden lg:flex justify-end transition-all duration-1000 delay-300 ${heroVisible ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-12 scale-95"}`}
+          >
             <div className="relative">
               <div className="w-[460px] h-[460px] rounded-3xl overflow-hidden shadow-2xl">
                 <img
@@ -210,7 +222,11 @@ export default function Home() {
               <Link
                 key={cat.id}
                 to={`/shop?category=${cat.id}`}
-                className={`group bg-white border border-slate-100 rounded-2xl p-5 flex flex-col items-center text-center hover:border-brand-200 hover:shadow-card-hover transition-all duration-300 ${categoriesVisible ? `animate-fade-in-up animate-delay-${(index % 4) * 100}` : "opacity-0"}`}
+                className={`group bg-white border border-slate-100 rounded-2xl p-5 flex flex-col items-center text-center hover:border-brand-200 hover:shadow-card-hover transition-all duration-500 ${categoriesVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+                style={{
+                  animationDelay: `${(index % 4) * 100}ms`,
+                  animationFillMode: "forwards",
+                }}
               >
                 <CategoryIcon className="w-10 h-10 text-brand-500 mb-3" />
                 <h3 className="font-semibold text-slate-800 text-sm mb-1 group-hover:text-brand-600 transition-colors">
@@ -248,11 +264,11 @@ export default function Home() {
             {featured.map((p, index) => (
               <div
                 key={p.id}
-                className={
-                  featuredVisible
-                    ? `animate-fade-in-up animate-delay-${index * 100}`
-                    : "opacity-0"
-                }
+                className={`${featuredVisible ? "animate-fade-in-up" : "opacity-0"}`}
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: "forwards",
+                }}
               >
                 <ProductCard product={p} />
               </div>
@@ -322,12 +338,16 @@ export default function Home() {
                 title: "Easy Returns",
                 desc: "30-day hassle-free return policy",
               },
-            ].map((f) => {
+            ].map((f, index) => {
               const FeatureIcon = f.icon;
               return (
                 <div
                   key={f.title}
-                  className="bg-white rounded-2xl p-6 flex items-start gap-4 border border-slate-100 hover:shadow-card transition-shadow"
+                  className={`bg-white rounded-2xl p-6 flex items-start gap-4 border border-slate-100 hover:shadow-card transition-all duration-500 ${featuresVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animationFillMode: "forwards",
+                  }}
                 >
                   <FeatureIcon className="w-6 h-6 text-brand-600 flex-shrink-0" />
                   <div>

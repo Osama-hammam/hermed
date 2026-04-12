@@ -171,7 +171,10 @@ export default function Checkout() {
           {/* Form */}
           <div className="lg:col-span-2 space-y-8">
             {/* Contact */}
-            <div className="bg-white rounded-2xl shadow-card p-6">
+            <div
+              className={`bg-white rounded-2xl shadow-card p-6 transition-all ${contentVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+              style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
+            >
               <h2 className="font-semibold text-slate-800 text-lg mb-5 flex items-center gap-2">
                 <span className="w-6 h-6 bg-brand-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
                   1
@@ -208,7 +211,10 @@ export default function Checkout() {
             </div>
 
             {/* Shipping */}
-            <div className="bg-white rounded-2xl shadow-card p-6">
+            <div
+              className={`bg-white rounded-2xl shadow-card p-6 transition-all ${contentVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+              style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
+            >
               <h2 className="font-semibold text-slate-800 text-lg mb-5 flex items-center gap-2">
                 <span className="w-6 h-6 bg-brand-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
                   2
@@ -305,7 +311,10 @@ export default function Checkout() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white rounded-2xl shadow-card p-6">
+            <div
+              className={`bg-white rounded-2xl shadow-card p-6 transition-all ${contentVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+              style={{ animationDelay: "300ms", animationFillMode: "forwards" }}
+            >
               <h2 className="font-semibold text-slate-800 text-lg mb-5 flex items-center gap-2">
                 <span className="w-6 h-6 bg-brand-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
                   3
@@ -397,7 +406,10 @@ export default function Checkout() {
           </div>
 
           {/* Order summary */}
-          <div>
+          <div
+            className={`${contentVisible ? "animate-fade-in-up opacity-100" : "opacity-0"}`}
+            style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
+          >
             <div className="bg-white rounded-2xl shadow-card p-6 sticky top-24">
               <h2 className="font-semibold text-slate-800 text-lg mb-5">
                 Order Summary
