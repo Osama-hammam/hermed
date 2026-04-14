@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useProductStore } from "../store";
 import ProductCard from "../components/ProductCard";
 import CategorySidebar from "../components/CategorySidebar";
-import Pagination from "./Pagination";
+import Pagination from "../components/Pagination";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Shop() {
