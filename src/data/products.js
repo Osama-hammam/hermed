@@ -358,13 +358,17 @@ const baseProducts = [
   },
 ];
 
-export const products = Array.from({ length: 100 }, (_, i) => {
+export const products = Array.from({ length: 20 }, (_, i) => {
   const base = baseProducts[i % baseProducts.length];
+  const name = `${base.name} #${i + 1}`;
   return {
     ...base,
     id: i + 1,
-    slug: `${base.slug}-${i + 1}`,
-    name: `${base.name} #${i + 1}`,
+    name: name,
+    slug: name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, ""),
     sku: `${base.sku}-${1000 + i}`,
     inStock: i % 15 !== 0, // Adds some variety to stock availability
   };

@@ -8,8 +8,12 @@ import {
   UserIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
-import { useCartStore, useAuthStore, useWishlistStore } from "../store";
-import { products } from "../data/products";
+import {
+  useCartStore,
+  useAuthStore,
+  useWishlistStore,
+  useProductStore,
+} from "../store";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -17,6 +21,7 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const products = useProductStore((s) => s.products);
   const cartCount = useCartStore((s) =>
     s.items.reduce((acc, i) => acc + i.qty, 0),
   );

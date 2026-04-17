@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { categories, products } from "../data/products";
+import { categories } from "../data/products";
 import {
   SparklesIcon,
   WrenchIcon,
@@ -14,6 +14,7 @@ import {
   ChatBubbleLeftRightIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import { useProductStore } from "../store";
 import ProductCard from "../components/ProductCard";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
@@ -43,9 +44,12 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const featured = products
-    .filter((p) => p.badge === "Best Seller" || p.badge === "New")
-    .slice(0, 4);
+  const products = useProductStore((s) => s.products);
+
+  // VERIFY SINGLE SOURCE OF TRUTH
+  console.log("PRODUCT STORE:", useProductStore.getState().products);
+
+  const featured = [...products].sort((a, b) => b.id - a.id).slice(0, 4);
 
   const [heroRef, heroVisible] = useScrollAnimation();
   const [categoriesRef, categoriesVisible] = useScrollAnimation();

@@ -15,8 +15,8 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
     setTimeout(() => {
-      const ok = login(email, password);
-      if (ok) navigate("/admin");
+      const result = login(email, password);
+      if (result.success) navigate("/admin");
       else setError("Invalid email or password.");
       setLoading(false);
     }, 600);

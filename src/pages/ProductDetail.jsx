@@ -19,7 +19,7 @@ export default function ProductDetail() {
 
   const { slug } = useParams();
   const products = useProductStore((s) => s.products);
-  const product = products.find((p) => p.slug === slug);
+  const product = products.find((p) => p.slug?.toLowerCase() === slug?.toLowerCase());
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
   const isWishlisted = useWishlistStore((s) =>
@@ -225,12 +225,17 @@ export default function ProductDetail() {
               </button>
             </div>
           ) : (
-            <button
-              disabled
-              className="w-full py-3.5 rounded-xl font-semibold bg-slate-100 text-slate-400 cursor-not-allowed"
-            >
-              Out of Stock
-            </button>
+            <div className="space-y-4">
+              <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium">
+                Sorry, this product is currently out of stock
+              </div>
+              <button
+                disabled
+                className="w-full py-3.5 rounded-xl font-semibold bg-slate-200 text-slate-500 cursor-not-allowed uppercase tracking-wider"
+              >
+                Out of Stock
+              </button>
+            </div>
           )}
 
           <div className="mt-6 flex gap-6 text-sm text-slate-500 flex-wrap">

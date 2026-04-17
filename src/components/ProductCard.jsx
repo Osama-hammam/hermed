@@ -18,6 +18,7 @@ export default function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
+    if (!product.inStock) return;
     setAdding(true);
     addItem(product);
     setTimeout(() => setAdding(false), 1000);
@@ -48,6 +49,15 @@ export default function ProductCard({ product }) {
           <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-brand-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
             {product.badge}
           </span>
+        )}
+
+        {/* Out of Stock Overlay */}
+        {!product.inStock && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+            <span className="bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg">
+              Out of Stock
+            </span>
+          </div>
         )}
 
         {/* Wishlist Button */}
@@ -90,20 +100,22 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            className={`p-2.5 rounded-xl transition-all duration-300 flex items-center justify-center ${
-              adding
-                ? "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-200"
-                : "bg-brand-50 text-brand-600 hover:bg-brand-600 hover:text-white"
-            }`}
-          >
-            {adding ? (
-              <span className="text-[10px] font-bold px-1">✓</span>
-            ) : (
-              <ShoppingBagIcon className="w-5 h-5" />
-            )}
-          </button>
+          {product.inStock && (
+            <button
+              onClick={handleAddToCart}
+              className={`p-2.5 rounded-xl transition-all duration-300 flex items-center justify-center ${
+                adding
+                  ? "bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-200"
+                  : "bg-brand-50 text-brand-600 hover:bg-brand-600 hover:text-white"
+              }`}
+            >
+              {adding ? (
+                <span className="text-[10px] font-bold px-1">✓</span>
+              ) : (
+                <ShoppingBagIcon className="w-5 h-5" />
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>

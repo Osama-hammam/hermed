@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCartStore } from "../store";
+import { useCartStore, useAuthStore } from "../store";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Checkout() {
   const [contentRef, contentVisible] = useScrollAnimation();
 
   const { items, clearCart } = useCartStore();
+  const addOrder = useAuthStore((s) => s.addOrder);
   const navigate = useNavigate();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
 
@@ -24,7 +25,7 @@ export default function Checkout() {
 
   const shipping = total > 0 && form.city ? 100 : 0;
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submittedOrderId, setSubmittedOrderId] = useState(null);
 
   const validate = () => {
     const e = {};
@@ -50,11 +51,26 @@ export default function Checkout() {
       setErrors(errs);
       return;
     }
-    setSubmitted(true);
+
+    const generatedId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+    const orderData = {
+      id: generatedId,
+      date: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      status: "Processing",
+      total: total + shipping,
+      items: items.map((item) => ({ ...item })),
+    };
+
+    if (addOrder) addOrder(orderData);
+    setSubmittedOrderId(generatedId);
     clearCart();
   };
 
-  if (submitted) {
+  if (submittedOrderId) {
     return (
       <div className="page-enter max-w-2xl mx-auto px-4 py-24 text-center">
         <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -82,7 +98,7 @@ export default function Checkout() {
         <div className="bg-slate-50 rounded-2xl p-5 mb-8 text-sm text-slate-600 inline-block">
           Order Reference:{" "}
           <strong className="text-brand-600 font-mono">
-            ORD-{Date.now().toString().slice(-6)}
+            {submittedOrderId}
           </strong>
         </div>
         <div className="flex gap-4 justify-center">

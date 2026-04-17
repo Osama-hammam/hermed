@@ -81,32 +81,62 @@ export const useWishlistStore = create(
 );
 
 // Products Store
-export const useProductStore = create((set, get) => ({
-  products: initialProducts,
+export const useProductStore = create(
+  persist(
+    (set, get) => ({
+      products: initialProducts,
 
-  addProduct: (product) => {
-    const products = get().products;
-    const newProduct = {
-      ...product,
-      id: Date.now(),
-      slug: product.name.toLowerCase().replace(/\s+/g, "-"),
-      rating: 0,
-      reviews: 0,
-      images: [product.image],
-    };
-    set({ products: [...products, newProduct] });
-  },
+      addProduct: (product) => {
+        const products = get().products;
+        const newProduct = {
+          ...product,
+          id: Date.now(),
+          slug: product.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, ""),
+          rating: 0,
+          reviews: 0,
+        };
+        set({ products: [newProduct, ...products] });
+      },
 
-  updateProduct: (id, updates) =>
-    set({
-      products: get().products.map((p) =>
-        p.id === id ? { ...p, ...updates } : p,
-      ),
+      updateProduct: (id, updates) =>
+        set({
+          products: get().products.map((p) =>
+            p.id === id ? { ...p, ...updates } : p,
+          ),
+        }),
+
+      deleteProduct: (id) =>
+        set({
+          products: get().products.filter((p) => p.id !== id),
+        }),
     }),
-
-  deleteProduct: (id) =>
-    set({ products: get().products.filter((p) => p.id !== id) }),
-}));
+    {
+      name: "hermed-products",
+      // Ensure all critical product fields survive page refresh
+      partialize: (state) => ({
+        products: state.products.map((p) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          originalPrice: p.originalPrice,
+          category: p.category,
+          image: p.image,
+          inStock: p.inStock,
+          slug: p.slug,
+          description: p.description,
+          features: p.features,
+          badge: p.badge,
+          sku: p.sku,
+          rating: p.rating,
+          reviews: p.reviews,
+        })),
+      }),
+    },
+  ),
+);
 
 // Auth Store (user authentication)
 export const useAuthStore = create(
@@ -114,13 +144,11 @@ export const useAuthStore = create(
     (set, get) => ({
       user: null,
       isAdmin: false,
+      users: [], // Keep all users and their orders here in state
 
       // Initialize with demo user if no users exist
       init: () => {
-        const existingUsers = JSON.parse(
-          localStorage.getItem("hermed-users") || "[]",
-        );
-        if (existingUsers.length === 0) {
+        if (get().users.length === 0) {
           const demoUser = {
             id: "demo",
             email: "demo@hermed.com",
@@ -128,20 +156,18 @@ export const useAuthStore = create(
             password: "demo123",
             createdAt: new Date().toISOString(),
             isAdmin: false,
+            orders: [],
           };
-          localStorage.setItem("hermed-users", JSON.stringify([demoUser]));
+          set({ users: [demoUser] });
         }
       },
 
       // User registration
       register: (userData) => {
         const { email, password, name } = userData;
+        const users = get().users;
 
-        // Check if user already exists
-        const existingUsers = JSON.parse(
-          localStorage.getItem("hermed-users") || "[]",
-        );
-        if (existingUsers.some((u) => u.email === email)) {
+        if (users.some((u) => u.email === email)) {
           return { success: false, message: "Email already registered" };
         }
 
@@ -153,15 +179,18 @@ export const useAuthStore = create(
           password, // In real app, this would be hashed
           createdAt: new Date().toISOString(),
           isAdmin: false,
+          orders: [],
         };
-
-        // Save to localStorage
-        const updatedUsers = [...existingUsers, newUser];
-        localStorage.setItem("hermed-users", JSON.stringify(updatedUsers));
 
         // Set as current user
         set({
-          user: { id: newUser.id, email: newUser.email, name: newUser.name },
+          users: [...users, newUser],
+          user: {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.name,
+            orders: [],
+          },
           isAdmin: false,
         });
 
@@ -177,14 +206,19 @@ export const useAuthStore = create(
         }
 
         // Check user login
-        const users = JSON.parse(localStorage.getItem("hermed-users") || "[]");
-        const user = users.find(
+        const users = get().users;
+        const u = users.find(
           (u) => u.email === email && u.password === password,
         );
 
-        if (user) {
+        if (u) {
           set({
-            user: { id: user.id, email: user.email, name: user.name },
+            user: {
+              id: u.id,
+              email: u.email,
+              name: u.name,
+              orders: u.orders || [],
+            },
             isAdmin: false,
           });
           return { success: true, message: "Login successful" };
@@ -196,6 +230,53 @@ export const useAuthStore = create(
       // Logout
       logout: () => set({ user: null, isAdmin: false }),
 
+      addOrder: (order) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+
+        set((state) => {
+          const updatedUsers = state.users.map((u) => {
+            if (u.email === currentUser.email) {
+              return { ...u, orders: [order, ...(u.orders || [])] };
+            }
+            return u;
+          });
+
+          return {
+            users: updatedUsers,
+            user: {
+              ...currentUser,
+              orders: [order, ...(currentUser.orders || [])],
+            },
+          };
+        });
+      },
+
+      updateOrderStatus: (orderId, newStatus) => {
+        set((state) => {
+          let updatedActiveUser = state.user ? { ...state.user } : null;
+
+          const updatedUsers = state.users.map((u) => {
+            const hasOrder = u.orders?.some((o) => o.id === orderId);
+            if (hasOrder) {
+              const updatedOrders = u.orders.map((o) =>
+                o.id === orderId ? { ...o, status: newStatus } : o,
+              );
+
+              // Sync active session if this updated order belongs to the current user
+              if (state.user && state.user.email === u.email) {
+                updatedActiveUser = { ...state.user, orders: updatedOrders };
+              }
+
+              return { ...u, orders: updatedOrders };
+            }
+            return u;
+          });
+
+          return { users: updatedUsers, user: updatedActiveUser };
+        });
+      },
+
       // Check if user is logged in
       get isLoggedIn() {
         return get().user !== null;
@@ -203,7 +284,11 @@ export const useAuthStore = create(
     }),
     {
       name: "hermed-auth",
-      partialize: (state) => ({ user: state.user, isAdmin: state.isAdmin }),
+      partialize: (state) => ({
+        user: state.user,
+        isAdmin: state.isAdmin,
+        users: state.users,
+      }),
     },
   ),
 );
