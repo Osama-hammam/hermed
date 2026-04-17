@@ -17,7 +17,6 @@ const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Account = lazy(() => import("./pages/Account"));
-const ScrollTest = lazy(() => import("./pages/ScrollTest"));
 
 // Lazy load admin components
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -92,7 +91,6 @@ function AppInner() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account" element={<Account />} />
-            <Route path="/scroll-test" element={<ScrollTest />} />
           </Routes>
         </Suspense>
       </main>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAuthStore } from "../../store";
 
 export default function AdminLogin() {
@@ -7,17 +7,32 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const login = useAuthStore((s) => s.login);
+  const { login, isAdmin } = useAuthStore();
   const navigate = useNavigate();
+
+  // إذا كان المستخدم مسجل دخوله كأدمن بالفعل، نتوجه للوحة التحكم مباشرة
+  if (isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
     setTimeout(() => {
       const result = login(email, password);
-      if (result.success) navigate("/admin");
-      else setError("Invalid email or password.");
+      if (result.success) {
+        // نتحقق مما إذا كان الحساب الذي سجل الدخول هو أدمن فعلاً
+        if (email === "admin@hermed.com") {
+          navigate("/admin");
+        } else {
+          setError("Access Denied: This portal is for administrators only.");
+          useAuthStore.getState().logout(); // تسجيل خروج إذا لم يكن أدمن
+        }
+      } else {
+        setError("Invalid email or password.");
+      }
       setLoading(false);
     }, 600);
   };
