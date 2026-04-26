@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useProductStore } from "../../store";
 import { categories } from "../../data/products";
 import {
@@ -6,6 +6,7 @@ import {
   XMarkIcon,
   ArrowUpTrayIcon,
 } from "@heroicons/react/24/outline";
+import Pagination from "../../components/Pagination";
 
 const EMPTY_FORM = {
   name: "",
@@ -16,6 +17,7 @@ const EMPTY_FORM = {
   description: "",
   badge: "",
   inStock: true,
+  stockCount: "",
   sku: "",
   features: "",
 };
@@ -71,17 +73,30 @@ export default function AdminProducts() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
+
   // Safety check: ensure products is always an array
   if (!Array.isArray(products))
     console.error("Store 'products' is not an array!");
 
-  const filtered = products
-    .filter(
-      (p) =>
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.category.toLowerCase().includes(search.toLowerCase()),
-    )
-    .sort((a, b) => b.id - a.id); // Show newest products first
+  const filtered = useMemo(() => {
+    return products
+      .filter(
+        (p) =>
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          p.category.toLowerCase().includes(search.toLowerCase()),
+      )
+      .sort((a, b) => b.id - a.id);
+  }, [products, search]);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginated = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, page]);
+
+  const handlePageChange = (p) => setPage(p);
 
   const closeForm = () => {
     console.log("AdminProducts: closeForm() executed");
@@ -105,6 +120,7 @@ export default function AdminProducts() {
       description: p.description,
       badge: p.badge || "",
       inStock: p.inStock,
+      stockCount: p.stockCount || 0,
       sku: p.sku || "",
       features: p.features?.join(", ") || "",
     });
@@ -162,6 +178,7 @@ export default function AdminProducts() {
     const data = {
       ...form,
       price: parseFloat(form.price),
+      stockCount: Math.max(0, parseInt(form.stockCount, 10) || 0),
       originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
       badge: form.badge || null,
       id: editId || Date.now(), // Ensure ID is consistent
@@ -169,6 +186,7 @@ export default function AdminProducts() {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, ""),
+      inStock: (parseInt(form.stockCount, 10) || 0) > 0,
       features: form.features
         ? form.features
             .split(",")
@@ -195,7 +213,14 @@ export default function AdminProducts() {
   };
 
   const handleInputChange = (name, value) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      // تحديث حالة التوفر تلقائياً بناءً على الكمية
+      if (name === "stockCount") {
+        next.inStock = (parseInt(value, 10) || 0) > 0;
+      }
+      return next;
+    });
   };
 
   return (
@@ -271,7 +296,7 @@ export default function AdminProducts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filtered.map((p) => (
+              {paginated.map((p) => (
                 <tr
                   key={p.id}
                   className="hover:bg-slate-50/50 transition-colors"
@@ -312,10 +337,13 @@ export default function AdminProducts() {
                     )}
                   </td>
                   <td className="px-5 py-4">
+                    <div className="text-xs text-slate-500 mb-1">
+                      {p.stockCount} items available
+                    </div>
                     <span
-                      className={`badge ${p.inStock ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"}`}
+                      className={`badge ${p.stockCount > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"}`}
                     >
-                      {p.inStock ? "In Stock" : "Out of Stock"}
+                      {p.stockCount > 0 ? "In Stock" : "Sold Out"}
                     </span>
                   </td>
                   <td className="px-5 py-4">
@@ -344,6 +372,14 @@ export default function AdminProducts() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-6">
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       {/* Add/Edit Modal */}
@@ -446,6 +482,15 @@ export default function AdminProducts() {
                   value={form.sku}
                   onChange={handleInputChange}
                   placeholder="NSK-Z95L"
+                  half
+                />
+                <FormField
+                  label="Inventory Level (stockCount) *"
+                  name="stockCount"
+                  value={form.stockCount}
+                  onChange={handleInputChange}
+                  type="number"
+                  placeholder="10"
                   half
                 />
 

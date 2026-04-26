@@ -67,8 +67,13 @@ export default function Cart() {
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start gap-3">
                   <div>
-                    <p className="text-xs text-brand-500 font-medium capitalize mb-0.5">
-                      {item.category}
+                    <p className="text-xs font-medium capitalize mb-0.5 flex items-center gap-2">
+                      <span className="text-brand-500">{item.category}</span>
+                      {item.stockCount < 10 && (
+                        <span className="text-amber-600 bg-amber-50 px-1.5 rounded">
+                          {item.stockCount} left
+                        </span>
+                      )}
                     </p>
                     <Link
                       to={`/product/${item.slug}`}
@@ -96,8 +101,14 @@ export default function Cart() {
                       {item.qty}
                     </span>
                     <button
-                      onClick={() => updateQty(item.id, item.qty + 1)}
+                      onClick={() =>
+                        updateQty(
+                          item.id,
+                          Math.min(item.stockCount, item.qty + 1),
+                        )
+                      }
                       className="w-10 h-10 text-slate-600 hover:bg-slate-50 transition-colors font-bold"
+                      disabled={item.qty >= item.stockCount}
                     >
                       +
                     </button>

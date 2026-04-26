@@ -76,6 +76,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "KV-MFC-LED",
+    stockCount: 10,
   },
   {
     id: 2,
@@ -102,6 +103,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "NSK-Z95L",
+    stockCount: 10,
   },
   {
     id: 3,
@@ -128,6 +130,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "DENT-XCP-KIT",
+    stockCount: 10,
   },
   {
     id: 4,
@@ -154,6 +157,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "3M-FSU-A2",
+    stockCount: 10,
   },
   {
     id: 5,
@@ -175,6 +179,7 @@ const baseProducts = [
     features: ["Powder-free", "Textured fingertips", "AQL 1.5", "FDA cleared"],
     inStock: true,
     sku: "MED-NITRILE-M",
+    stockCount: 10,
   },
   {
     id: 6,
@@ -201,6 +206,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "HF-GCY-SET",
+    stockCount: 10,
   },
   {
     id: 7,
@@ -225,6 +231,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "DENT-PTG-F1",
+    stockCount: 10,
   },
   {
     id: 8,
@@ -249,8 +256,9 @@ const baseProducts = [
       "Passive slide mechanism",
       "Complete upper & lower",
     ],
-    inStock: false,
+    inStock: true,
     sku: "ORM-DC-KIT",
+    stockCount: 10,
   },
   {
     id: 9,
@@ -277,6 +285,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "MDM-M9-AUTO",
+    stockCount: 10,
   },
   {
     id: 10,
@@ -303,6 +312,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "PLM-PS-HD",
+    stockCount: 10,
   },
   {
     id: 11,
@@ -329,6 +339,7 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "IVO-TEF-A2",
+    stockCount: 10,
   },
   {
     id: 12,
@@ -355,10 +366,11 @@ const baseProducts = [
     ],
     inStock: true,
     sku: "HS-EXP-SET",
+    stockCount: 10,
   },
 ];
 
-export const products = Array.from({ length: 20 }, (_, i) => {
+export const products = Array.from({ length: 100 }, (_, i) => {
   const base = baseProducts[i % baseProducts.length];
   const name = `${base.name} #${i + 1}`;
   return {
@@ -370,7 +382,8 @@ export const products = Array.from({ length: 20 }, (_, i) => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, ""),
     sku: `${base.sku}-${1000 + i}`,
-    inStock: i % 15 !== 0, // Adds some variety to stock availability
+    stockCount: 10,
+    inStock: true,
   };
 });
 

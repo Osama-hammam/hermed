@@ -18,7 +18,7 @@ export default function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    if (!product.inStock) return;
+    if (!product.inStock || product.stockCount <= 0) return;
     setAdding(true);
     addItem(product);
     setTimeout(() => setAdding(false), 1000);
@@ -44,15 +44,23 @@ export default function ProductCard({ product }) {
           }}
         />
 
-        {/* Badge */}
-        {product.badge && (
-          <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-brand-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
-            {product.badge}
-          </span>
-        )}
+        {/* Badges Container */}
+        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start z-20">
+          {product.badge && (
+            <span className="bg-white/90 backdrop-blur-sm text-brand-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
+              {product.badge}
+            </span>
+          )}
+
+          {product.inStock && product.stockCount > 0 && (
+            <span className={`text-[10px] font-bold px-2 py-1 rounded-full shadow-sm ${product.stockCount < 10 ? 'bg-amber-500 text-white animate-pulse' : 'bg-white/90 text-slate-700'}`}>
+              {product.stockCount < 10 ? `Only ${product.stockCount} left` : `${product.stockCount} in stock`}
+            </span>
+          )}
+        </div>
 
         {/* Out of Stock Overlay */}
-        {!product.inStock && (
+        {(!product.inStock || product.stockCount <= 0) && (
           <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
             <span className="bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg">
               Out of Stock
@@ -100,7 +108,7 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-          {product.inStock && (
+          {product.inStock && product.stockCount > 0 && (
             <button
               onClick={handleAddToCart}
               className={`p-2.5 rounded-xl transition-all duration-300 flex items-center justify-center ${

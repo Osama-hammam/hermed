@@ -19,7 +19,9 @@ export default function ProductDetail() {
 
   const { slug } = useParams();
   const products = useProductStore((s) => s.products);
-  const product = products.find((p) => p.slug?.toLowerCase() === slug?.toLowerCase());
+  const product = products.find(
+    (p) => p.slug?.toLowerCase() === slug?.toLowerCase(),
+  );
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
   const isWishlisted = useWishlistStore((s) =>
@@ -111,9 +113,16 @@ export default function ProductDetail() {
                 {product.badge}
               </span>
             )}
-            {!product.inStock && (
+            {product.inStock && product.stockCount > 0 && (
+              <span
+                className={`text-xs font-medium px-2.5 py-1 rounded-full ${product.stockCount < 10 ? "text-amber-700 bg-amber-50" : "text-slate-600 bg-slate-100"}`}
+              >
+                {product.stockCount} items left in stock
+              </span>
+            )}
+            {(!product.inStock || product.stockCount <= 0) && (
               <span className="text-xs font-medium text-red-600 bg-red-50 px-2.5 py-1 rounded-full">
-                Out of Stock
+                Currently Out of Stock
               </span>
             )}
             <button
@@ -211,7 +220,7 @@ export default function ProductDetail() {
                   {qty}
                 </span>
                 <button
-                  onClick={() => setQty(qty + 1)}
+                  onClick={() => setQty(Math.min(product.stockCount, qty + 1))}
                   className="w-10 h-12 text-slate-600 hover:bg-slate-50 transition-colors font-bold text-lg"
                 >
                   +

@@ -25,7 +25,7 @@ export default function Shop() {
     const p = parseInt(searchParams.get("page") || "1", 10);
     return isNaN(p) || p < 1 ? 1 : p;
   }, [searchParams]);
-  const itemsPerPage = 20;
+  const itemsPerPage = 12;
 
   useEffect(() => {
     const isSearchDiff = search !== (searchParams.get("search") || "");
@@ -144,26 +144,32 @@ export default function Shop() {
           </div>
 
           {/* Results count */}
-          <p className="text-sm text-slate-500 mb-5">
-            Showing{" "}
-            <strong className="text-slate-700">{filtered.length}</strong>{" "}
-            product{filtered.length !== 1 ? "s" : ""}
-            {category && (
-              <span>
-                {" "}
-                in{" "}
-                <strong className="text-brand-600 capitalize">
-                  {category}
-                </strong>
-              </span>
-            )}
-            {search && (
-              <span>
-                {" "}
-                for "<strong className="text-brand-600">{search}</strong>"
-              </span>
-            )}
-          </p>
+          <div className="flex justify-between items-center mb-5">
+            <p className="text-sm text-slate-500">
+              Showing{" "}
+              <strong className="text-slate-700">
+                {filtered.length > 0 ? (page - 1) * itemsPerPage + 1 : 0}–
+                {Math.min(page * itemsPerPage, filtered.length)}
+              </strong>{" "}
+              of <strong className="text-slate-700">{filtered.length}</strong>{" "}
+              products
+              {category && (
+                <span>
+                  {" "}
+                  in{" "}
+                  <strong className="text-brand-600 capitalize">
+                    {category}
+                  </strong>
+                </span>
+              )}
+              {search && (
+                <span>
+                  {" "}
+                  for "<strong className="text-brand-600">{search}</strong>"
+                </span>
+              )}
+            </p>
+          </div>
 
           {filtered.length === 0 ? (
             <div className="text-center py-24 bg-slate-50 rounded-2xl">

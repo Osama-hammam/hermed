@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   }, [users]);
 
   const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
-  const inStock = products.filter((p) => p.inStock).length;
+  const totalStock = products.reduce((sum, p) => sum + (p.stockCount || 0), 0);
 
   const stats = [
     {
@@ -52,8 +52,8 @@ export default function AdminDashboard() {
       link: "#",
     },
     {
-      label: "In Stock",
-      value: inStock,
+      label: "Total Units",
+      value: totalStock.toLocaleString(),
       icon: "✅",
       color: "bg-violet-50 text-violet-600",
       link: "/admin/products",
@@ -182,11 +182,11 @@ export default function AdminDashboard() {
                     <p className="text-sm font-semibold text-slate-900">
                       EGP {p.price.toFixed(2)}
                     </p>
-                    <span
-                      className={`text-xs font-medium ${p.inStock ? "text-emerald-600" : "text-red-500"}`}
+                    <p
+                      className={`text-[10px] font-bold uppercase tracking-tight ${p.stockCount < 10 ? "text-amber-500" : "text-slate-400"}`}
                     >
-                      {p.inStock ? "In Stock" : "Out of Stock"}
-                    </span>
+                      {p.stockCount} Units
+                    </p>
                   </div>
                 </div>
               ))

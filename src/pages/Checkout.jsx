@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCartStore, useAuthStore } from "../store";
+import { useCartStore, useAuthStore, useProductStore } from "../store";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function Checkout() {
@@ -8,6 +8,9 @@ export default function Checkout() {
 
   const { items, clearCart } = useCartStore();
   const addOrder = useAuthStore((s) => s.addOrder);
+  const products = useProductStore((s) => s.products);
+  const updateProduct = useProductStore((s) => s.updateProduct);
+
   const navigate = useNavigate();
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
 
@@ -66,6 +69,20 @@ export default function Checkout() {
     };
 
     if (addOrder) addOrder(orderData);
+
+    // Decrement stock for each item purchased
+    items.forEach((item) => {
+      const originalProduct = products.find((p) => p.id === item.id);
+      if (originalProduct) {
+        const newQty = Math.max(0, originalProduct.stockCount - item.qty);
+        updateProduct(item.id, {
+          ...originalProduct,
+          stockCount: newQty,
+          inStock: newQty > 0,
+        });
+      }
+    });
+
     setSubmittedOrderId(generatedId);
     clearCart();
   };

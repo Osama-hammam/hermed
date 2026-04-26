@@ -3,7 +3,34 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) return null;
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const getPageNumbers = () => {
+    const delta = 1; // Number of pages to show around current page
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - delta && i <= currentPage + delta)
+      ) {
+        range.push(i);
+      }
+    }
+
+    for (let i of range) {
+      if (l) {
+        if (i - l === 2) rangeWithDots.push(l + 1);
+        else if (i - l !== 1) rangeWithDots.push("...");
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
+    return rangeWithDots;
+  };
+
+  const pages = getPageNumbers();
 
   return (
     <nav
@@ -20,20 +47,29 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       </button>
 
       <div className="flex items-center gap-1 md:gap-1.5 px-1 md:px-2">
-        {pages.map((p) => (
-          <button
-            key={p}
-            onClick={() => onPageChange(p)}
-            className={`w-11 h-11 md:w-10 md:h-10 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentPage === p
-                ? "bg-brand-600 text-white shadow-lg shadow-brand-200 ring-2 ring-brand-600 ring-offset-2"
-                : "text-slate-500 hover:bg-slate-50 border border-transparent hover:border-slate-200 hover:text-brand-600"
-            }`}
-            aria-current={currentPage === p ? "page" : undefined}
-          >
-            {p}
-          </button>
-        ))}
+        {pages.map((p) =>
+          p === "..." ? (
+            <span
+              key={Math.random()}
+              className="w-8 text-center text-slate-400"
+            >
+              &hellip;
+            </span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPageChange(p)}
+              className={`w-11 h-11 md:w-10 md:h-10 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                currentPage === p
+                  ? "bg-brand-600 text-white shadow-lg shadow-brand-200 ring-2 ring-brand-600 ring-offset-2"
+                  : "text-slate-500 hover:bg-slate-50 border border-transparent hover:border-slate-200 hover:text-brand-600"
+              }`}
+              aria-current={currentPage === p ? "page" : undefined}
+            >
+              {p}
+            </button>
+          ),
+        )}
       </div>
 
       <button
