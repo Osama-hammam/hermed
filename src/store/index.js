@@ -363,6 +363,25 @@ export const useAuthStore = create(
                 isAdmin,
                 loading: false,
               });
+
+              // Restore user's saved cart & wishlist
+              try {
+                const savedCart = localStorage.getItem(`hermed-cart-${data.user.id}`);
+                if (savedCart) {
+                  const parsed = JSON.parse(savedCart);
+                  if (parsed && parsed.length > 0) {
+                    useCartStore.setState({ items: parsed });
+                  }
+                }
+                const savedWish = localStorage.getItem(`hermed-wish-${data.user.id}`);
+                if (savedWish) {
+                  const parsed = JSON.parse(savedWish);
+                  if (parsed && parsed.length > 0) {
+                    useWishlistStore.setState({ items: parsed });
+                  }
+                }
+              } catch (e) { /* ignore parse errors */ }
+
               return { success: true, isAdmin, message: "Login successful" };
             }
           } catch (err) {
@@ -394,8 +413,23 @@ export const useAuthStore = create(
 
       // Logout
       logout: async () => {
+        // Save cart & wishlist for this user before clearing
+        const currentUser = get().user;
+        if (currentUser?.id) {
+          try {
+            const cartItems = useCartStore.getState().items;
+            const wishItems = useWishlistStore.getState().items;
+            if (cartItems.length > 0) {
+              localStorage.setItem(`hermed-cart-${currentUser.id}`, JSON.stringify(cartItems));
+            }
+            if (wishItems.length > 0) {
+              localStorage.setItem(`hermed-wish-${currentUser.id}`, JSON.stringify(wishItems));
+            }
+          } catch (e) { /* ignore */ }
+        }
+
         set({ user: null, isAdmin: false });
-        // Clear cart and wishlist
+        // Clear active cart and wishlist
         useCartStore.getState().clearCart();
         useWishlistStore.setState({ items: [] });
         if (isSupabaseConfigured && supabase) {
