@@ -20,13 +20,27 @@ export default {
         surface: "#f8fafc",
       },
       fontFamily: {
-        sans: ["'Inter'", "system-ui", "sans-serif"],
-        display: ["'Inter'", "system-ui", "sans-serif"],
-        body: ["'Inter'", "system-ui", "sans-serif"],
+        sans: ["'DM Sans'", "system-ui", "sans-serif"],
+        display: ["'DM Sans'", "system-ui", "sans-serif"],
+        body: ["'DM Sans'", "system-ui", "sans-serif"],
       },
       boxShadow: {
         card: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(37,99,235,0.08)",
         "card-hover": "0 8px 32px rgba(37,99,235,0.15)",
+      },
+      keyframes: {
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
+        'fade-in': 'fade-in 0.4s ease-out forwards',
       },
     },
   },

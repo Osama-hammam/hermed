@@ -15,26 +15,25 @@ export default function AdminLogin() {
     return <Navigate to="/admin" replace />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      const result = login(email, password);
-      if (result.success) {
-        // نتحقق مما إذا كان الحساب الذي سجل الدخول هو أدمن فعلاً
-        if (email === "admin@hermed.com") {
-          navigate("/admin");
-        } else {
-          setError("Access Denied: This portal is for administrators only.");
-          useAuthStore.getState().logout(); // تسجيل خروج إذا لم يكن أدمن
-        }
+    const result = await login(email, password);
+    if (result.success) {
+      // Check if the logged-in user has admin role
+      const currentState = useAuthStore.getState();
+      if (currentState.isAdmin) {
+        navigate("/admin");
       } else {
-        setError("Invalid email or password.");
+        setError("Access Denied: This portal is for administrators only.");
+        await currentState.logout();
       }
-      setLoading(false);
-    }, 600);
+    } else {
+      setError(result.message || "Invalid email or password.");
+    }
+    setLoading(false);
   };
 
   return (

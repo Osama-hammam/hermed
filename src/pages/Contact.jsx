@@ -1,4 +1,6 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import {
   MapPinIcon,
   PhoneIcon,
@@ -32,13 +34,29 @@ export default function Contact() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
       return;
     }
+
+    // Save to Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('contact_messages').insert({
+        name: form.name,
+        email: form.email,
+        subject: form.subject,
+        message: form.message,
+      });
+      if (error) {
+        toast.error('Failed to send message. Please try again.');
+        return;
+      }
+    }
+
+    toast.success('Message sent successfully!');
     setSent(true);
   };
 

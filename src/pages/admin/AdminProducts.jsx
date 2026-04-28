@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
+import toast from "react-hot-toast";
 import { useProductStore } from "../../store";
 import { categories } from "../../data/products";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import {
   PhotoIcon,
   XMarkIcon,
@@ -63,9 +65,7 @@ export default function AdminProducts() {
   const updateProduct = useProductStore((s) => s.updateProduct);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
 
-  // VERIFY SINGLE SOURCE OF TRUTH
-  console.log("PRODUCT STORE:", useProductStore.getState().products);
-  console.log("REACTIVE PRODUCTS:", products);
+
 
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -76,9 +76,6 @@ export default function AdminProducts() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Safety check: ensure products is always an array
-  if (!Array.isArray(products))
-    console.error("Store 'products' is not an array!");
 
   const filtered = useMemo(() => {
     return products
@@ -99,7 +96,6 @@ export default function AdminProducts() {
   const handlePageChange = (p) => setPage(p);
 
   const closeForm = () => {
-    console.log("AdminProducts: closeForm() executed");
     setShowForm(false);
     setEditId(null);
     setForm(EMPTY_FORM);
@@ -128,10 +124,29 @@ export default function AdminProducts() {
     setShowForm(true);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // If Supabase is configured, upload to storage
+    if (isSupabaseConfigured && supabase) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('products')
+        .upload(fileName, file, { upsert: true });
+      
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('products')
+          .getPublicUrl(fileName);
+        setForm((prev) => ({ ...prev, image: publicUrl }));
+        toast.success('Image uploaded');
+        return;
+      }
+    }
+
+    // Fallback: use base64
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
@@ -139,41 +154,27 @@ export default function AdminProducts() {
       img.src = event.target.result;
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800; // Reasonable width for web display
+        const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
         let width = img.width;
         let height = img.height;
-
         if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
         } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
         }
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
-
-        // Compress quality to 60% and use JPEG format for smaller Base64 strings
         const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
         setForm((prev) => ({ ...prev, image: dataUrl }));
       };
     };
   };
 
-  const handleSave = () => {
-    if (!form.name || !form.price || !form.image) {
-      console.warn(
-        "AdminProducts: Save blocked - missing required fields (name, price, or image)",
-      );
-      return;
-    }
+  const handleSave = async () => {
+    if (!form.name || !form.price || !form.image) return;
 
     const data = {
       ...form,
@@ -181,35 +182,28 @@ export default function AdminProducts() {
       stockCount: Math.max(0, parseInt(form.stockCount, 10) || 0),
       originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
       badge: form.badge || null,
-      id: editId || Date.now(), // Ensure ID is consistent
-      slug: (form.name || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, ""),
+      id: editId || Date.now(),
+      slug: (form.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
       inStock: (parseInt(form.stockCount, 10) || 0) > 0,
-      features: form.features
-        ? form.features
-            .split(",")
-            .map((f) => f.trim())
-            .filter(Boolean)
-        : [],
+      features: form.features ? form.features.split(",").map((f) => f.trim()).filter(Boolean) : [],
       rating: editId ? products.find((p) => p.id === editId)?.rating || 0 : 0,
       reviews: editId ? products.find((p) => p.id === editId)?.reviews || 0 : 0,
     };
 
-    console.log("DEBUG: Calling store action with data:", data);
-    if (editId) updateProduct(editId, data);
-    else addProduct(data);
-
-    closeForm(); // Ensure modal closes and state resets
-    console.log("DEBUG: closeForm() executed after store update");
+    if (editId) {
+      await updateProduct(editId, data);
+      toast.success('Product updated');
+    } else {
+      await addProduct(data);
+      toast.success('Product added');
+    }
+    closeForm();
   };
 
-  const handleDelete = (id) => {
-    console.log("DEBUG: handleDelete() confirmed for ID:", id);
-    deleteProduct(id);
-    setDeleteConfirm(null); // Close the confirmation modal
-    console.log("DEBUG: deleteConfirm set to null");
+  const handleDelete = async (id) => {
+    await deleteProduct(id);
+    setDeleteConfirm(null);
+    toast.success('Product deleted');
   };
 
   const handleInputChange = (name, value) => {

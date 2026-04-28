@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useCartStore, useAuthStore, useProductStore } from "../store";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
@@ -47,7 +48,7 @@ export default function Checkout() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) {
@@ -58,31 +59,42 @@ export default function Checkout() {
     const generatedId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const orderData = {
       id: generatedId,
+      customerName: `${form.firstName} ${form.lastName}`,
+      customerEmail: form.email,
+      customerPhone: form.phone,
+      shippingAddress: form.address,
+      shippingCity: form.city,
+      shippingCountry: form.country,
+      notes: form.notes,
+      paymentMethod: form.paymentMethod,
+      subtotal: total,
+      shipping,
+      total: total + shipping,
+      items: items.map((item) => ({ ...item })),
       date: new Date().toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
       }),
       status: "Processing",
-      total: total + shipping,
-      items: items.map((item) => ({ ...item })),
     };
 
-    if (addOrder) addOrder(orderData);
+    if (addOrder) await addOrder(orderData);
 
-    // Decrement stock for each item purchased
-    items.forEach((item) => {
+    // Decrement stock
+    for (const item of items) {
       const originalProduct = products.find((p) => p.id === item.id);
       if (originalProduct) {
         const newQty = Math.max(0, originalProduct.stockCount - item.qty);
-        updateProduct(item.id, {
+        await updateProduct(item.id, {
           ...originalProduct,
           stockCount: newQty,
           inStock: newQty > 0,
         });
       }
-    });
+    }
 
+    toast.success('Order placed successfully!');
     setSubmittedOrderId(generatedId);
     clearCart();
   };

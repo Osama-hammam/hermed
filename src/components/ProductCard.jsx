@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useCartStore, useWishlistStore } from "../store";
 import {
   HeartIcon as HeartOutline,
@@ -21,12 +22,18 @@ export default function ProductCard({ product }) {
     if (!product.inStock || product.stockCount <= 0) return;
     setAdding(true);
     addItem(product);
+    toast.success(`${product.name} added to cart`);
     setTimeout(() => setAdding(false), 1000);
   };
 
   const handleToggleWishlist = (e) => {
     e.preventDefault();
     toggleWishlist(product);
+    if (isWishlisted) {
+      toast('Removed from wishlist', { icon: '💔' });
+    } else {
+      toast.success('Added to wishlist');
+    }
   };
 
   return (

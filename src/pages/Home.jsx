@@ -45,11 +45,7 @@ export default function Home() {
   }, [slides.length]);
 
   const products = useProductStore((s) => s.products);
-
-  // VERIFY SINGLE SOURCE OF TRUTH
-  console.log("PRODUCT STORE:", useProductStore.getState().products);
-
-  const featured = [...products].sort((a, b) => b.id - a.id).slice(0, 4);
+  const featured = [...products].sort((a, b) => b.rating - a.rating).slice(0, 4);
 
   const [heroRef, heroVisible] = useScrollAnimation();
   const [categoriesRef, categoriesVisible] = useScrollAnimation();

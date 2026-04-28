@@ -1,60 +1,104 @@
-import React, { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuthStore } from "../../store";
 import {
-  ShoppingBagIcon,
   UserIcon,
   ClockIcon,
   CheckCircleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   MagnifyingGlassIcon,
+  TruckIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 
+const statusOptions = ["Processing", "Shipped", "Delivered", "Cancelled"];
+
 export default function AdminOrders() {
-  // Aggregates all orders from all users in the mock store
-  const users = useAuthStore((s) => s.users) || [];
+  const fetchAllOrders = useAuthStore((s) => s.fetchAllOrders);
   const updateOrderStatus = useAuthStore((s) => s.updateOrderStatus);
 
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState(null);
 
-  const allOrders = useMemo(() => {
-    const orders = [];
-    users.forEach((user) => {
-      if (user.orders) {
-        user.orders.forEach((order) => {
-          orders.push({
-            ...order,
-            customerName: user.name,
-            customerEmail: user.email,
-          });
-        });
+  // Fetch orders from Supabase on mount
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      const data = await fetchAllOrders();
+      if (!cancelled) {
+        setOrders(data || []);
+        setLoading(false);
       }
-    });
-    return orders.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [users]);
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [fetchAllOrders]);
 
   const filteredOrders = useMemo(() => {
-    return allOrders.filter((order) => {
+    return orders.filter((order) => {
       const matchesFilter =
-        filter === "all" || order.status.toLowerCase() === filter.toLowerCase();
+        filter === "all" || order.status?.toLowerCase() === filter.toLowerCase();
       const matchesSearch =
-        order.id.toLowerCase().includes(search.toLowerCase()) ||
-        order.customerName.toLowerCase().includes(search.toLowerCase());
+        (order.id || "").toLowerCase().includes(search.toLowerCase()) ||
+        (order.customer_name || "").toLowerCase().includes(search.toLowerCase()) ||
+        (order.customer_email || "").toLowerCase().includes(search.toLowerCase());
       return matchesFilter && matchesSearch;
     });
-  }, [allOrders, filter, search]);
+  }, [orders, filter, search]);
 
-  const handleStatusUpdate = (orderId, newStatus) => {
+  const handleStatusUpdate = async (orderId, newStatus) => {
     if (updateOrderStatus) {
-      updateOrderStatus(orderId, newStatus);
+      await updateOrderStatus(orderId, newStatus);
+      // Refresh orders
+      const data = await fetchAllOrders();
+      setOrders(data || []);
     }
   };
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  const statusIcon = (status) => {
+    switch (status) {
+      case "Delivered":
+        return <CheckCircleIcon className="w-3.5 h-3.5" />;
+      case "Shipped":
+        return <TruckIcon className="w-3.5 h-3.5" />;
+      case "Cancelled":
+        return <XCircleIcon className="w-3.5 h-3.5" />;
+      default:
+        return <ClockIcon className="w-3.5 h-3.5" />;
+    }
+  };
+
+  const statusColor = (status) => {
+    switch (status) {
+      case "Delivered":
+        return "bg-emerald-50 text-emerald-600";
+      case "Shipped":
+        return "bg-amber-50 text-amber-600";
+      case "Cancelled":
+        return "bg-red-50 text-red-600";
+      default:
+        return "bg-blue-50 text-blue-600";
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-brand-600"></div>
+          <span className="text-sm text-slate-400">Loading orders...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -64,11 +108,11 @@ export default function AdminOrders() {
             Order Management
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Manage and track all customer orders
+            {orders.length} total orders
           </p>
         </div>
         <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-slate-100 p-1">
-          {["all", "processing", "delivered"].map((f) => (
+          {["all", "processing", "shipped", "delivered", "cancelled"].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -130,8 +174,8 @@ export default function AdminOrders() {
                 </tr>
               ) : (
                 filteredOrders.map((order) => (
-                  <React.Fragment key={order.id}>
-                    <tr className="hover:bg-slate-50/50 transition-colors">
+                  <>
+                    <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4">
                         <button
                           onClick={() => toggleExpand(order.id)}
@@ -150,7 +194,7 @@ export default function AdminOrders() {
                             {order.id}
                           </span>
                           <span className="text-xs text-slate-400 flex items-center gap-1 mt-1">
-                            <ClockIcon className="w-3 h-3" /> {order.date}
+                            <ClockIcon className="w-3 h-3" /> {new Date(order.created_at).toLocaleDateString()}
                           </span>
                         </div>
                       </td>
@@ -161,80 +205,105 @@ export default function AdminOrders() {
                           </div>
                           <div className="flex flex-col">
                             <span className="text-sm font-semibold text-slate-800">
-                              {order.customerName}
+                              {order.customer_name || "Guest"}
                             </span>
                             <span className="text-xs text-slate-400">
-                              {order.customerEmail}
+                              {order.customer_email || "—"}
                             </span>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            order.status === "Delivered"
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "bg-blue-50 text-blue-600"
-                          }`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusColor(order.status)}`}
                         >
+                          {statusIcon(order.status)}
                           {order.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-slate-900">
-                        EGP {order.total.toFixed(2)}
+                        EGP {parseFloat(order.total || 0).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {order.status === "Processing" && (
-                          <button
-                            onClick={() =>
-                              handleStatusUpdate(order.id, "Delivered")
-                            }
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-600 hover:bg-brand-600 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm"
-                          >
-                            <CheckCircleIcon className="w-4 h-4" /> Mark
-                            Delivered
-                          </button>
+                        {order.status !== "Delivered" && order.status !== "Cancelled" && (
+                          <div className="flex items-center gap-2 justify-end">
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                              className="text-xs font-medium border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white"
+                            >
+                              {statusOptions.map((s) => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                          </div>
                         )}
                       </td>
                     </tr>
                     {expandedId === order.id && (
-                      <tr className="bg-slate-50/50 border-t border-slate-100">
+                      <tr key={`${order.id}-expanded`} className="bg-slate-50/50 border-t border-slate-100">
                         <td colSpan="6" className="px-6 py-4">
                           <div className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Phone</p>
+                                <p className="text-sm text-slate-700">{order.customer_phone || "—"}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Address</p>
+                                <p className="text-sm text-slate-700">{order.shipping_address || "—"}, {order.shipping_city || ""}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Payment</p>
+                                <p className="text-sm text-slate-700 capitalize">{order.payment_method || "COD"}</p>
+                              </div>
+                            </div>
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
                               Order Items
                             </p>
-                            {order.items.map((item) => (
-                              <div
-                                key={item.id}
-                                className="flex items-center justify-between text-sm bg-white p-3 rounded-xl border border-slate-100 shadow-sm"
-                              >
-                                <div className="flex items-center gap-4">
-                                  <img
-                                    src={item.image}
-                                    alt=""
-                                    className="w-10 h-10 object-cover rounded-lg bg-slate-50"
-                                  />
-                                  <div>
-                                    <p className="font-bold text-slate-800">
-                                      {item.name}
-                                    </p>
-                                    <p className="text-xs text-slate-500">
-                                      Qty: {item.qty} × EGP{" "}
-                                      {item.price.toFixed(2)}
-                                    </p>
+                            {(order.order_items || []).length === 0 ? (
+                              <p className="text-sm text-slate-400">No items data available.</p>
+                            ) : (
+                              order.order_items.map((item, idx) => (
+                                <div
+                                  key={item.id || idx}
+                                  className="flex items-center justify-between text-sm bg-white p-3 rounded-xl border border-slate-100 shadow-sm"
+                                >
+                                  <div className="flex items-center gap-4">
+                                    {item.product_image && (
+                                      <img
+                                        src={item.product_image}
+                                        alt=""
+                                        className="w-10 h-10 object-cover rounded-lg bg-slate-50"
+                                      />
+                                    )}
+                                    <div>
+                                      <p className="font-bold text-slate-800">
+                                        {item.product_name}
+                                      </p>
+                                      <p className="text-xs text-slate-500">
+                                        Qty: {item.quantity} × EGP{" "}
+                                        {parseFloat(item.price || 0).toFixed(2)}
+                                      </p>
+                                    </div>
                                   </div>
+                                  <p className="font-bold text-slate-900">
+                                    EGP {(item.quantity * parseFloat(item.price || 0)).toFixed(2)}
+                                  </p>
                                 </div>
-                                <p className="font-bold text-slate-900">
-                                  EGP {(item.qty * item.price).toFixed(2)}
-                                </p>
+                              ))
+                            )}
+                            {order.notes && (
+                              <div className="mt-3">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Notes</p>
+                                <p className="text-sm text-slate-600 bg-white p-3 rounded-xl border border-slate-100">{order.notes}</p>
                               </div>
-                            ))}
+                            )}
                           </div>
                         </td>
                       </tr>
                     )}
-                  </React.Fragment>
+                  </>
                 ))
               )}
             </tbody>

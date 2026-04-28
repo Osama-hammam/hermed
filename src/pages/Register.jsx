@@ -42,7 +42,7 @@ export default function Register() {
       return;
     }
 
-    const result = register({
+    const result = await register({
       name: formData.name,
       email: formData.email,
       password: formData.password,

@@ -13,10 +13,6 @@ export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const products = useProductStore((s) => s.products);
 
-  // VERIFY SINGLE SOURCE OF TRUTH
-  console.log("PRODUCT STORE:", useProductStore.getState().products);
-  console.log("REACTIVE PRODUCTS:", products);
-
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [sort, setSort] = useState("default");

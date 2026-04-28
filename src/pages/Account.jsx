@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store";
 import { UserIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
@@ -8,8 +8,27 @@ export default function Account() {
   const [contentRef, contentVisible] = useScrollAnimation();
 
   const { user, logout } = useAuthStore();
-  const orders = user?.orders || [];
+  const fetchUserOrders = useAuthStore((s) => s.fetchUserOrders);
   const [activeTab, setActiveTab] = useState("profile");
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  // Fetch orders when the orders tab is activated
+  useEffect(() => {
+    if (activeTab === "orders" && user) {
+      let cancelled = false;
+      const load = async () => {
+        setLoadingOrders(true);
+        const data = await fetchUserOrders();
+        if (!cancelled) {
+          setOrders(data || []);
+          setLoadingOrders(false);
+        }
+      };
+      load();
+      return () => { cancelled = true; };
+    }
+  }, [activeTab, user, fetchUserOrders]);
 
   if (!user) {
     return (
@@ -154,7 +173,12 @@ export default function Account() {
                     Order History
                   </h2>
 
-                  {orders.length === 0 ? (
+                  {loadingOrders ? (
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-600 mx-auto"></div>
+                      <p className="text-slate-400 text-sm mt-3">Loading orders...</p>
+                    </div>
+                  ) : orders.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg
@@ -178,6 +202,9 @@ export default function Account() {
                         Your order history will appear here once you make your
                         first purchase.
                       </p>
+                      <Link to="/shop" className="btn-primary">
+                        Start Shopping
+                      </Link>
                     </div>
                   ) : (
                     <div className="space-y-6">
@@ -193,7 +220,11 @@ export default function Account() {
                                   Date
                                 </p>
                                 <p className="text-sm font-semibold text-slate-700">
-                                  {order.date}
+                                  {new Date(order.created_at).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
                                 </p>
                               </div>
                               <div>
@@ -201,7 +232,7 @@ export default function Account() {
                                   Total
                                 </p>
                                 <p className="text-sm font-bold text-brand-600">
-                                  EGP {order.total.toFixed(2)}
+                                  EGP {parseFloat(order.total || 0).toFixed(2)}
                                 </p>
                               </div>
                             </div>
@@ -213,6 +244,10 @@ export default function Account() {
                                 className={`px-3 py-1 rounded-full text-xs font-bold ${
                                   order.status === "Delivered"
                                     ? "bg-emerald-50 text-emerald-600"
+                                    : order.status === "Shipped"
+                                    ? "bg-amber-50 text-amber-600"
+                                    : order.status === "Cancelled"
+                                    ? "bg-red-50 text-red-600"
                                     : "bg-blue-50 text-blue-600"
                                 }`}
                               >
@@ -221,26 +256,28 @@ export default function Account() {
                             </div>
                           </div>
                           <div className="p-4 divide-y divide-slate-50">
-                            {order.items.map((item) => (
+                            {(order.order_items || []).map((item, idx) => (
                               <div
-                                key={item.id}
+                                key={item.id || idx}
                                 className="py-3 first:pt-0 last:pb-0 flex items-center gap-4"
                               >
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-14 h-14 object-cover rounded-lg bg-slate-50"
-                                />
+                                {item.product_image && (
+                                  <img
+                                    src={item.product_image}
+                                    alt={item.product_name}
+                                    className="w-14 h-14 object-cover rounded-lg bg-slate-50"
+                                  />
+                                )}
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-bold text-slate-800 truncate">
-                                    {item.name}
+                                    {item.product_name}
                                   </p>
                                   <p className="text-xs text-slate-500">
-                                    Quantity: {item.qty}
+                                    Quantity: {item.quantity}
                                   </p>
                                 </div>
                                 <div className="text-sm font-bold text-slate-900">
-                                  EGP {item.price.toFixed(2)}
+                                  EGP {parseFloat(item.price || 0).toFixed(2)}
                                 </div>
                               </div>
                             ))}

@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuthStore } from "./store";
+import { useAuthStore, useProductStore } from "./store";
 
 // Lazy load page components for code splitting
 const Home = lazy(() => import("./pages/Home"));
@@ -17,6 +18,7 @@ const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Account = lazy(() => import("./pages/Account"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load admin components
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -27,7 +29,10 @@ const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-600"></div>
+    <div className="flex flex-col items-center gap-3">
+      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-brand-600"></div>
+      <span className="text-sm text-slate-400">Loading...</span>
+    </div>
   </div>
 );
 
@@ -35,20 +40,25 @@ function AppInner() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
   const initAuth = useAuthStore((s) => s.init);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const productsInitialized = useProductStore((s) => s.initialized);
 
-  // Initialize auth store
+  // Initialize auth and products
   useEffect(() => {
     initAuth();
   }, [initAuth]);
 
+  useEffect(() => {
+    if (!productsInitialized) {
+      fetchProducts();
+    }
+  }, [fetchProducts, productsInitialized]);
+
   // Ensure pages start from the top
   useLayoutEffect(() => {
-    // Disable browser's automatic scroll restoration
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
-
-    // Always start from the top for new page visits
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
@@ -91,6 +101,7 @@ function AppInner() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account" element={<Account />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
@@ -103,6 +114,25 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppInner />
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#0f172a',
+            color: '#fff',
+            borderRadius: '12px',
+            padding: '12px 16px',
+            fontSize: '14px',
+          },
+          success: {
+            iconTheme: { primary: '#10b981', secondary: '#fff' },
+          },
+          error: {
+            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+          },
+        }}
+      />
     </BrowserRouter>
   );
 }

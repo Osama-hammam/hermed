@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useProductStore, useAuthStore } from "../../store";
 
@@ -7,27 +7,41 @@ const statusColors = {
   Processing: "bg-blue-100 text-blue-700",
   Shipped: "bg-amber-100 text-amber-700",
   Pending: "bg-slate-100 text-slate-600",
+  Cancelled: "bg-red-100 text-red-600",
 };
 
 export default function AdminDashboard() {
   const products = useProductStore((s) => s.products);
-  const users = useAuthStore((s) => s.users) || [];
+  const fetchAllOrders = useAuthStore((s) => s.fetchAllOrders);
 
-  // Dynamically aggregate orders from all users in the store
-  const allOrders = useMemo(() => {
-    const list = [];
-    users.forEach((user) => {
-      if (user.orders) {
-        user.orders.forEach((order) => {
-          list.push({ ...order, customer: user.name });
-        });
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  // Fetch orders from Supabase on mount
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoadingOrders(true);
+      const data = await fetchAllOrders();
+      if (!cancelled) {
+        setOrders(data || []);
+        setLoadingOrders(false);
       }
-    });
-    return list.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [users]);
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [fetchAllOrders]);
 
-  const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
+  const totalRevenue = useMemo(
+    () => orders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0),
+    [orders]
+  );
   const totalStock = products.reduce((sum, p) => sum + (p.stockCount || 0), 0);
+
+  const recentOrders = useMemo(
+    () => [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 4),
+    [orders]
+  );
 
   const stats = [
     {
@@ -39,7 +53,7 @@ export default function AdminDashboard() {
     },
     {
       label: "Total Orders",
-      value: allOrders.length,
+      value: orders.length,
       icon: "🧾",
       color: "bg-emerald-50 text-emerald-600",
       link: "/admin/orders",
@@ -107,30 +121,35 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div className="space-y-3">
-            {allOrders.length === 0 ? (
+            {loadingOrders ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-600 mx-auto"></div>
+                <p className="text-slate-400 text-sm mt-3">Loading orders...</p>
+              </div>
+            ) : recentOrders.length === 0 ? (
               <div className="text-center py-8 text-slate-400 text-sm">
                 No orders yet.
               </div>
             ) : (
-              allOrders.slice(0, 4).map((order) => (
+              recentOrders.map((order) => (
                 <div
                   key={order.id}
                   className="flex items-center justify-between py-2.5 border-b border-slate-50 last:border-0"
                 >
                   <div>
                     <p className="text-sm font-medium text-slate-800">
-                      {order.customer}
+                      {order.customer_name || "Guest"}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {order.id} · {order.date}
+                      {order.id} · {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-slate-900">
-                      EGP {order.total.toFixed(2)}
+                      EGP {parseFloat(order.total || 0).toFixed(2)}
                     </p>
                     <span
-                      className={`badge text-xs ${statusColors[order.status]}`}
+                      className={`badge text-xs ${statusColors[order.status] || "bg-slate-100 text-slate-600"}`}
                     >
                       {order.status}
                     </span>
@@ -141,7 +160,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Low Stock */}
+        {/* Product Overview */}
         <div className="bg-white rounded-2xl shadow-card p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-semibold text-slate-800">Product Overview</h2>

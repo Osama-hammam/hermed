@@ -1,8 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { products as initialProducts } from "../data/products";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { products as fallbackProducts, categories as fallbackCategories } from "../data/products";
 
-// Cart Store
+// ═══════════════════════════════════════════════════════════════
+// CART STORE — stays in localStorage for instant UX
+// ═══════════════════════════════════════════════════════════════
 export const useCartStore = create(
   persist(
     (set, get) => ({
@@ -46,7 +49,9 @@ export const useCartStore = create(
   ),
 );
 
-// Wishlist Store
+// ═══════════════════════════════════════════════════════════════
+// WISHLIST STORE — localStorage + Supabase sync when available
+// ═══════════════════════════════════════════════════════════════
 export const useWishlistStore = create(
   persist(
     (set, get) => ({
@@ -55,11 +60,25 @@ export const useWishlistStore = create(
       addItem: (product) => {
         if (!get().items.some((item) => item.id === product.id)) {
           set({ items: [...get().items, product] });
+          // Sync to Supabase if available
+          if (isSupabaseConfigured && supabase) {
+            const userId = useAuthStore.getState().user?.id;
+            if (userId) {
+              supabase.from('wishlist').insert({ user_id: userId, product_id: product.id }).then();
+            }
+          }
         }
       },
 
-      removeItem: (id) =>
-        set({ items: get().items.filter((item) => item.id !== id) }),
+      removeItem: (id) => {
+        set({ items: get().items.filter((item) => item.id !== id) });
+        if (isSupabaseConfigured && supabase) {
+          const userId = useAuthStore.getState().user?.id;
+          if (userId) {
+            supabase.from('wishlist').delete().eq('user_id', userId).eq('product_id', id).then();
+          }
+        }
+      },
 
       toggleItem: (product) => {
         const exists = get().items.some((item) => item.id === product.id);
@@ -80,204 +99,379 @@ export const useWishlistStore = create(
   ),
 );
 
-// Products Store
-export const useProductStore = create(
-  persist(
-    (set, get) => ({
-      products: initialProducts,
+// ═══════════════════════════════════════════════════════════════
+// PRODUCT STORE — Supabase with fallback to local data
+// ═══════════════════════════════════════════════════════════════
+export const useProductStore = create((set, get) => ({
+  products: [],
+  categories: fallbackCategories,
+  loading: false,
+  initialized: false,
 
-      addProduct: (product) => {
-        const products = get().products;
-        const newProduct = {
-          ...product,
-          id: Date.now(),
-          slug: product.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, ""),
-          rating: 0,
-          reviews: 0,
-        };
-        set({ products: [newProduct, ...products] });
-      },
+  fetchProducts: async () => {
+    if (get().loading) return;
+    set({ loading: true });
 
-      updateProduct: (id, updates) =>
-        set({
-          products: get().products.map((p) =>
-            p.id === id ? { ...p, ...updates } : p,
-          ),
-        }),
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      deleteProduct: (id) =>
-        set({
-          products: get().products.filter((p) => p.id !== id),
-        }),
-    }),
-    {
-      name: "hermed-products",
-      // Ensure all critical product fields survive page refresh
-      partialize: (state) => ({
-        products: state.products.map((p) => ({
-          id: p.id,
-          name: p.name,
-          price: p.price,
-          originalPrice: p.originalPrice,
-          category: p.category,
-          image: p.image,
-          inStock: p.inStock,
-          slug: p.slug,
-          description: p.description,
-          features: p.features,
-          badge: p.badge,
-          sku: p.sku,
-          rating: p.rating,
-          reviews: p.reviews,
-        })),
-      }),
-    },
-  ),
-);
+        if (!error && data && data.length > 0) {
+          // Map Supabase fields to app fields
+          const mapped = data.map(p => ({
+            id: p.id,
+            slug: p.slug,
+            name: p.name,
+            category: p.category_id,
+            price: parseFloat(p.price),
+            originalPrice: p.original_price ? parseFloat(p.original_price) : null,
+            rating: parseFloat(p.rating || 0),
+            reviews: p.reviews || 0,
+            badge: p.badge,
+            image: p.image,
+            images: p.images || [],
+            description: p.description,
+            features: p.features || [],
+            inStock: p.in_stock,
+            stockCount: p.stock_count,
+            sku: p.sku,
+          }));
+          set({ products: mapped, loading: false, initialized: true });
+          return;
+        }
+      } catch (err) {
+        console.warn('Supabase fetch failed, using fallback data');
+      }
+    }
 
-// Auth Store (user authentication)
+    // Fallback to local data
+    set({ products: fallbackProducts, loading: false, initialized: true });
+  },
+
+  addProduct: async (product) => {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase.from('products').insert({
+        name: product.name,
+        slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+        category_id: product.category,
+        price: product.price,
+        original_price: product.originalPrice || null,
+        badge: product.badge || null,
+        image: product.image,
+        images: product.images || [],
+        description: product.description,
+        features: product.features || [],
+        in_stock: (parseInt(product.stockCount) || 0) > 0,
+        stock_count: parseInt(product.stockCount) || 0,
+        sku: product.sku,
+      }).select().single();
+
+      if (!error && data) {
+        await get().fetchProducts();
+        return;
+      }
+    }
+
+    // Fallback: add to local state
+    const products = get().products;
+    const newProduct = {
+      ...product,
+      id: Date.now(),
+      slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+      rating: 0,
+      reviews: 0,
+    };
+    set({ products: [newProduct, ...products] });
+  },
+
+  updateProduct: async (id, updates) => {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('products').update({
+        name: updates.name,
+        slug: updates.slug || updates.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+        category_id: updates.category,
+        price: updates.price,
+        original_price: updates.originalPrice || null,
+        badge: updates.badge || null,
+        image: updates.image,
+        description: updates.description,
+        features: updates.features || [],
+        in_stock: updates.inStock,
+        stock_count: updates.stockCount,
+        sku: updates.sku,
+        updated_at: new Date().toISOString(),
+      }).eq('id', id);
+
+      if (!error) {
+        await get().fetchProducts();
+        return;
+      }
+    }
+
+    // Fallback
+    set({
+      products: get().products.map((p) =>
+        p.id === id ? { ...p, ...updates } : p,
+      ),
+    });
+  },
+
+  deleteProduct: async (id) => {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (!error) {
+        await get().fetchProducts();
+        return;
+      }
+    }
+
+    // Fallback
+    set({ products: get().products.filter((p) => p.id !== id) });
+  },
+}));
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH STORE — Supabase Auth with localStorage fallback
+// ═══════════════════════════════════════════════════════════════
 export const useAuthStore = create(
   persist(
     (set, get) => ({
       user: null,
       isAdmin: false,
-      users: [], // Keep all users and their orders here in state
+      loading: false,
+      initialized: false,
 
-      // Initialize with demo user if no users exist
-      init: () => {
-        if (get().users.length === 0) {
-          const demoUser = {
-            id: "demo",
-            email: "demo@hermed.com",
-            name: "Demo User",
-            password: "demo123",
-            createdAt: new Date().toISOString(),
-            isAdmin: false,
-            orders: [],
-          };
-          set({ users: [demoUser] });
+      // Initialize auth — call once on app load
+      init: async () => {
+        if (get().initialized) return;
+
+        if (isSupabaseConfigured && supabase) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+
+            set({
+              user: {
+                id: session.user.id,
+                email: session.user.email,
+                name: profile?.name || session.user.email?.split('@')[0],
+              },
+              isAdmin: profile?.role === 'admin',
+              initialized: true,
+            });
+          } else {
+            set({ initialized: true });
+          }
+
+          // Listen for auth changes
+          supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session?.user) {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+              set({
+                user: {
+                  id: session.user.id,
+                  email: session.user.email,
+                  name: profile?.name || session.user.email?.split('@')[0],
+                },
+                isAdmin: profile?.role === 'admin',
+              });
+            } else if (event === 'SIGNED_OUT') {
+              set({ user: null, isAdmin: false });
+            }
+          });
+        } else {
+          set({ initialized: true });
         }
       },
 
-      // User registration
-      register: (userData) => {
+      // Register
+      register: async (userData) => {
         const { email, password, name } = userData;
-        const users = get().users;
 
-        if (users.some((u) => u.email === email)) {
-          return { success: false, message: "Email already registered" };
+        if (isSupabaseConfigured && supabase) {
+          set({ loading: true });
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { name } },
+          });
+
+          set({ loading: false });
+
+          if (error) {
+            return { success: false, message: error.message };
+          }
+
+          if (data.user) {
+            set({
+              user: {
+                id: data.user.id,
+                email: data.user.email,
+                name: name,
+              },
+              isAdmin: false,
+            });
+            return { success: true, message: "Account created successfully" };
+          }
+          return { success: true, message: "Check your email for confirmation" };
         }
 
-        // Create new user
-        const newUser = {
-          id: Date.now(),
-          email,
-          name,
-          password, // In real app, this would be hashed
-          createdAt: new Date().toISOString(),
-          isAdmin: false,
-          orders: [],
-        };
-
-        // Set as current user
+        // Fallback — demo mode
         set({
-          users: [...users, newUser],
-          user: {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-            orders: [],
-          },
+          user: { id: Date.now().toString(), email, name },
           isAdmin: false,
         });
-
-        return { success: true, message: "Account created successfully" };
+        return { success: true, message: "Account created (demo mode)" };
       },
 
-      // User login
-      login: (email, password) => {
-        // Check admin login
-        if (email === "admin@hermed.com" && password === "hermed2024") {
-          set({ user: { id: "admin", email, name: "Admin" }, isAdmin: true });
-          return { success: true, message: "Admin login successful" };
+      // Login
+      login: async (email, password) => {
+        if (isSupabaseConfigured && supabase) {
+          set({ loading: true });
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          set({ loading: false });
+
+          if (error) {
+            return { success: false, message: error.message };
+          }
+
+          if (data.user) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+
+            set({
+              user: {
+                id: data.user.id,
+                email: data.user.email,
+                name: profile?.name || data.user.email?.split('@')[0],
+              },
+              isAdmin: profile?.role === 'admin',
+            });
+            return { success: true, message: "Login successful" };
+          }
         }
 
-        // Check user login
-        const users = get().users;
-        const u = users.find(
-          (u) => u.email === email && u.password === password,
-        );
-
-        if (u) {
+        // Fallback — demo mode
+        if (email === "demo@hermed.com" && password === "demo123") {
           set({
-            user: {
-              id: u.id,
-              email: u.email,
-              name: u.name,
-              orders: u.orders || [],
-            },
+            user: { id: "demo", email, name: "Demo User" },
             isAdmin: false,
           });
-          return { success: true, message: "Login successful" };
+          return { success: true, message: "Login successful (demo)" };
         }
-
+        if (email === "admin@hermed.com" && password === "admin123") {
+          set({
+            user: { id: "admin", email, name: "Admin" },
+            isAdmin: true,
+          });
+          return { success: true, message: "Admin login (demo)" };
+        }
         return { success: false, message: "Invalid email or password" };
       },
 
       // Logout
-      logout: () => set({ user: null, isAdmin: false }),
-
-      addOrder: (order) => {
-        const currentUser = get().user;
-        if (!currentUser) return;
-
-        set((state) => {
-          const updatedUsers = state.users.map((u) => {
-            if (u.email === currentUser.email) {
-              return { ...u, orders: [order, ...(u.orders || [])] };
-            }
-            return u;
-          });
-
-          return {
-            users: updatedUsers,
-            user: {
-              ...currentUser,
-              orders: [order, ...(currentUser.orders || [])],
-            },
-          };
-        });
+      logout: async () => {
+        if (isSupabaseConfigured && supabase) {
+          await supabase.auth.signOut();
+        }
+        set({ user: null, isAdmin: false });
       },
 
-      updateOrderStatus: (orderId, newStatus) => {
-        set((state) => {
-          let updatedActiveUser = state.user ? { ...state.user } : null;
+      // Place order
+      addOrder: async (order) => {
+        if (isSupabaseConfigured && supabase) {
+          const currentUser = get().user;
+          if (!currentUser) return;
 
-          const updatedUsers = state.users.map((u) => {
-            const hasOrder = u.orders?.some((o) => o.id === orderId);
-            if (hasOrder) {
-              const updatedOrders = u.orders.map((o) =>
-                o.id === orderId ? { ...o, status: newStatus } : o,
-              );
-
-              // Sync active session if this updated order belongs to the current user
-              if (state.user && state.user.email === u.email) {
-                updatedActiveUser = { ...state.user, orders: updatedOrders };
-              }
-
-              return { ...u, orders: updatedOrders };
-            }
-            return u;
+          const { error } = await supabase.from('orders').insert({
+            id: order.id,
+            user_id: currentUser.id,
+            customer_name: order.customerName,
+            customer_email: order.customerEmail,
+            customer_phone: order.customerPhone,
+            shipping_address: order.shippingAddress,
+            shipping_city: order.shippingCity,
+            shipping_country: order.shippingCountry || 'Egypt',
+            notes: order.notes,
+            payment_method: order.paymentMethod,
+            subtotal: order.subtotal,
+            shipping: order.shipping,
+            total: order.total,
+            status: 'Processing',
           });
 
-          return { users: updatedUsers, user: updatedActiveUser };
-        });
+          if (!error && order.items) {
+            const orderItems = order.items.map(item => ({
+              order_id: order.id,
+              product_id: item.id,
+              product_name: item.name,
+              product_image: item.image,
+              quantity: item.qty,
+              price: item.price,
+            }));
+            await supabase.from('order_items').insert(orderItems);
+          }
+        }
       },
 
-      // Check if user is logged in
+      // Fetch user orders
+      fetchUserOrders: async () => {
+        if (isSupabaseConfigured && supabase) {
+          const currentUser = get().user;
+          if (!currentUser) return [];
+
+          const { data } = await supabase
+            .from('orders')
+            .select('*, order_items(*)')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+          return data || [];
+        }
+        return [];
+      },
+
+      // Fetch all orders (admin)
+      fetchAllOrders: async () => {
+        if (isSupabaseConfigured && supabase) {
+          const { data } = await supabase
+            .from('orders')
+            .select('*, order_items(*)')
+            .order('created_at', { ascending: false });
+          return data || [];
+        }
+        return [];
+      },
+
+      // Update order status (admin)
+      updateOrderStatus: async (orderId, newStatus) => {
+        if (isSupabaseConfigured && supabase) {
+          await supabase
+            .from('orders')
+            .update({ status: newStatus, updated_at: new Date().toISOString() })
+            .eq('id', orderId);
+        }
+      },
+
       get isLoggedIn() {
         return get().user !== null;
       },
@@ -287,7 +481,6 @@ export const useAuthStore = create(
       partialize: (state) => ({
         user: state.user,
         isAdmin: state.isAdmin,
-        users: state.users,
       }),
     },
   ),
