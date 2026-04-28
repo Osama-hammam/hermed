@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuthStore } from "../../store";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, isAdmin } = useAuthStore();
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const navigate = useNavigate();
 
   // إذا كان المستخدم مسجل دخوله كأدمن بالفعل، نتوجه للوحة التحكم مباشرة
@@ -20,20 +21,68 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
 
-    const result = await login(email, password);
-    if (result.success) {
-      // Re-read the store after login to get the latest isAdmin value
-      const currentState = useAuthStore.getState();
-      if (currentState.isAdmin) {
-        navigate("/admin", { replace: true });
-      } else {
-        setError("Access Denied: This portal is for administrators only.");
-        // Logout the non-admin user from admin portal
-        currentState.logout();
+    try {
+      if (!isSupabaseConfigured || !supabase) {
+        // Demo mode
+        if (email === "admin@hermed.com" && password === "admin123") {
+          useAuthStore.setState({
+            user: { id: "admin", email, name: "Admin" },
+            isAdmin: true,
+          });
+          navigate("/admin", { replace: true });
+        } else {
+          setError("Invalid email or password.");
+        }
+        setLoading(false);
+        return;
       }
-    } else {
-      setError(result.message || "Invalid email or password.");
+
+      // Sign in with Supabase
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        if (authError.message?.includes('Email not confirmed')) {
+          setError('Please confirm your email first. Check your inbox.');
+        } else {
+          setError("Invalid email or password.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        // Fetch profile to check admin role
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          // Set admin state and navigate
+          useAuthStore.setState({
+            user: {
+              id: data.user.id,
+              email: data.user.email,
+              name: profile?.name || data.user.email?.split('@')[0],
+            },
+            isAdmin: true,
+          });
+          navigate("/admin", { replace: true });
+        } else {
+          setError("Access Denied: This portal is for administrators only.");
+          // Sign out non-admin user from this portal
+          await supabase.auth.signOut();
+          useAuthStore.setState({ user: null, isAdmin: false });
+        }
+      }
+    } catch (err) {
+      setError("Connection error. Please try again.");
     }
+
     setLoading(false);
   };
 
