@@ -1,200 +1,135 @@
 import { Link } from "react-router-dom";
-import {
-  MapPinIcon,
-  PhoneIcon,
-  EnvelopeIcon,
-  ClockIcon,
-} from "@heroicons/react/24/outline";
-import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
-function FacebookIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.88v-6.99H7.898v-2.89h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.242 0-1.63.772-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12Z" />
-    </svg>
-  );
-}
-
-function InstagramIcon(props) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
-      <path d="M16 11.37a4 4 0 1 1-7.99.5 4 4 0 0 1 7.99-.5Z" />
-      <path d="M17.5 6.5h.01" />
-    </svg>
-  );
-}
-
-function LinkedInIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M4.98 3.5C3.34 3.5 2 4.84 2 6.48c0 1.65 1.34 2.99 2.98 2.99 1.65 0 2.99-1.34 2.99-2.99 0-1.64-1.34-2.98-2.99-2.98ZM2.5 8.73H5.4V21H2.5V8.73ZM8.93 8.73H11.8v1.68h.04c.39-.74 1.35-1.52 2.78-1.52 2.98 0 3.51 1.96 3.51 4.52V21h-2.9v-5.73c0-1.37-.03-3.14-1.91-3.14-1.91 0-2.2 1.49-2.2 3.03V21H8.93V8.73Z" />
-    </svg>
-  );
-}
+const footerLinks = [
+  {
+    title: "Shop",
+    links: [
+      { label: "All Products", to: "/shop" },
+      { label: "Handpieces", to: "/shop?category=handpieces" },
+      { label: "Instruments", to: "/shop?category=instruments" },
+      { label: "Materials", to: "/shop?category=materials" },
+      { label: "Imaging", to: "/shop?category=imaging" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About Us", to: "/about" },
+      { label: "Contact", to: "/contact" },
+      { label: "Privacy Policy", to: "#" },
+      { label: "Terms of Service", to: "#" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "FAQs", to: "/contact" },
+      { label: "Shipping Info", to: "#" },
+      { label: "Returns", to: "#" },
+      { label: "Track Order", to: "/account" },
+    ],
+  },
+];
 
 export default function Footer() {
-  const [footerRef, footerVisible] = useScrollAnimation();
-
   return (
-    <footer
-      ref={footerRef}
-      className={`bg-slate-900 text-slate-300 mt-24 transition-all duration-1000 ease-out ${footerVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-          {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2.5 mb-6 group"
-            >
-              <img
-                src="/hermed.jpeg"
-                alt="HERMED"
-                className="h-12 w-auto object-contain transition-opacity group-hover:opacity-80"
-                onError={(e) =>
-                  (e.target.src =
-                    "https://ui-avatars.com/api/?name=HERMED&background=1d4ed8&color=fff")
-                }
-              />
-            </Link>
-            <p className="text-sm text-slate-300 leading-relaxed mb-6 max-w-xs">
-              Your trusted partner for premium dental supplies, serving dental
-              professionals across the Middle East since 2010.
-            </p>
-            <div className="flex gap-3">
-              <a
-                href="#"
-                aria-label="Facebook"
-                className="w-8 h-8 bg-slate-800 hover:bg-brand-600 rounded-lg flex items-center justify-center transition-colors text-slate-300 hover:text-white"
-              >
-                <FacebookIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="w-8 h-8 bg-slate-800 hover:bg-brand-600 rounded-lg flex items-center justify-center transition-colors text-slate-300 hover:text-white"
-              >
-                <InstagramIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="LinkedIn"
-                className="w-8 h-8 bg-slate-800 hover:bg-brand-600 rounded-lg flex items-center justify-center transition-colors text-slate-300 hover:text-white"
-              >
-                <LinkedInIcon className="w-4 h-4" />
-              </a>
+    <footer className="bg-slate-900 text-white relative overflow-hidden">
+      {/* Decorative gradient */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-600/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Newsletter */}
+        <div className="py-12 border-b border-slate-800">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-xl font-bold mb-1">Stay Updated</h3>
+              <p className="text-slate-400 text-sm">
+                Get exclusive offers and new product updates.
+              </p>
             </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-widest opacity-90">
-              Quick Links
-            </h4>
-            <ul className="space-y-3.5 text-sm">
-              {[
-                { to: "/shop", label: "Shop All" },
-                { to: "/about", label: "About Us" },
-                { to: "/contact", label: "Contact" },
-                { to: "/admin", label: "Admin Portal" },
-              ].map((l) => (
-                <li key={l.to}>
-                  <Link
-                    to={l.to}
-                    className="hover:text-white hover:translate-x-1 inline-block transition-all text-slate-300"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-widest opacity-90">
-              Categories
-            </h4>
-            <ul className="space-y-3.5 text-sm">
-              {[
-                "Handpieces",
-                "Instruments",
-                "Materials",
-                "Imaging",
-                "Hygiene & PPE",
-                "Endodontics",
-              ].map((c) => (
-                <li key={c}>
-                  <Link
-                    to={`/shop?category=${c.toLowerCase().replace(/ & /g, "-")}`}
-                    className="hover:text-white inline-block transition-colors text-slate-300"
-                  >
-                    {c}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-widest opacity-90">
-              Contact Us
-            </h4>
-            <ul className="space-y-4 text-sm text-slate-300">
-              <li className="flex gap-2.5 items-start">
-                <MapPinIcon className="w-5 h-5 text-brand-500 flex-shrink-0" />
-                <span>25 Medical District St., Cairo, Egypt 11311</span>
-              </li>
-              <li className="flex gap-2.5">
-                <PhoneIcon className="w-5 h-5 text-brand-500 flex-shrink-0" />
-                <a
-                  href="tel:+20221234567"
-                  className="hover:text-white transition-colors"
-                >
-                  +20 2 2123 4567
-                </a>
-              </li>
-              <li className="flex gap-2.5">
-                <EnvelopeIcon className="w-5 h-5 text-brand-500 flex-shrink-0" />
-                <a
-                  href="mailto:orders@hermed.com"
-                  className="hover:text-white transition-colors"
-                >
-                  orders@hermed.com
-                </a>
-              </li>
-              <li className="flex gap-2.5">
-                <ClockIcon className="w-5 h-5 text-brand-500 flex-shrink-0" />
-                <span>Sun–Thu: 9:00 AM – 6:00 PM</span>
-              </li>
-            </ul>
+            <div className="flex w-full md:w-auto gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 md:w-72 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+              />
+              <button className="bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-brand-600/25 whitespace-nowrap">
+                Subscribe
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-slate-400">
-          <p>
-            © {new Date().getFullYear()} HERMED Dental Supplies. All rights
-            reserved.
+        {/* Links Grid */}
+        <div className="py-14 grid grid-cols-2 md:grid-cols-5 gap-8">
+          {/* Brand */}
+          <div className="col-span-2">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-600/20">
+                <span className="text-white text-lg font-bold font-display">H</span>
+              </div>
+              <div>
+                <span className="font-display font-bold text-white text-lg">HERMED</span>
+                <div className="text-[10px] text-slate-500 tracking-widest uppercase">Dental Supplies</div>
+              </div>
+            </div>
+            <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
+              Your trusted partner for premium dental instruments, equipment, and supplies. Serving dental professionals across Egypt.
+            </p>
+            {/* Social Links */}
+            <div className="flex gap-3">
+              {[
+                { label: "FB", icon: "M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" },
+                { label: "IG", icon: "M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M6.5 2h11A4.5 4.5 0 0122 6.5v11a4.5 4.5 0 01-4.5 4.5h-11A4.5 4.5 0 012 17.5v-11A4.5 4.5 0 016.5 2z" },
+                { label: "WA", icon: "M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" },
+              ].map((social) => (
+                <a
+                  key={social.label}
+                  href="#"
+                  className="w-10 h-10 bg-slate-800 hover:bg-brand-600 rounded-xl flex items-center justify-center transition-all duration-300 group"
+                >
+                  <svg className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d={social.icon} />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Link Columns */}
+          {footerLinks.map((group) => (
+            <div key={group.title}>
+              <h4 className="font-bold text-white text-sm mb-4">{group.title}</h4>
+              <ul className="space-y-2.5">
+                {group.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-sm text-slate-400 hover:text-brand-400 transition-colors duration-200"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="py-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-500">
+            © {new Date().getFullYear()} HERMED Dental Supplies. All rights reserved.
           </p>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-slate-300 transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:text-slate-300 transition-colors">
-              Terms of Use
-            </a>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-600">We accept:</span>
+            <div className="flex gap-2">
+              {["Visa", "MC", "Cash"].map((method) => (
+                <span key={method} className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md">
+                  {method}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>

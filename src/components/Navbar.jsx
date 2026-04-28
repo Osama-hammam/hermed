@@ -86,15 +86,15 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-white/70 backdrop-blur-lg shadow-lg border-b border-white/20"
+            ? "bg-white/80 backdrop-blur-2xl shadow-lg shadow-slate-900/5 border-b border-slate-100/50"
             : "bg-white"
         }`}
       >
         {/* Top strip */}
-        <div className="bg-brand-700 text-white text-xs text-center py-1.5 px-4">
-          Free shipping on orders over EGP 300 &nbsp;·&nbsp; Professional dental
+        <div className="bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 text-white text-xs text-center py-2 px-4 font-medium tracking-wide">
+          ✨ Free shipping on orders over EGP 300 &nbsp;·&nbsp; Professional dental
           supplies since 2010
         </div>
 

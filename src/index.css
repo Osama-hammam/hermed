@@ -16,56 +16,106 @@
     background-color: #ffffff;
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background-color: rgba(29, 78, 216, 0.15);
+    color: #1e3a5f;
   }
 }
 
 @layer components {
+  /* ── Buttons ── */
   .btn-primary {
-    @apply bg-brand-500 hover:bg-brand-600 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98];
+    @apply bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2;
   }
   .btn-secondary {
-    @apply border border-brand-500 text-brand-500 hover:bg-brand-50 font-medium px-6 py-2.5 rounded-lg transition-all duration-200;
+    @apply border border-brand-200 text-brand-600 hover:bg-brand-50 hover:border-brand-300 font-semibold px-6 py-2.5 rounded-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2;
   }
   .btn-ghost {
-    @apply text-slate-600 hover:text-brand-500 hover:bg-brand-50 font-medium px-4 py-2 rounded-lg transition-all duration-200;
+    @apply text-slate-600 hover:text-brand-600 hover:bg-brand-50/50 font-medium px-4 py-2 rounded-xl transition-all duration-300;
   }
+
+  /* ── Cards ── */
   .card {
-    @apply bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden;
+    @apply bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-500 overflow-hidden;
   }
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+
+  /* ── Inputs ── */
   .input {
-    @apply w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 transition-all;
+    @apply w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-400/40 focus:border-brand-400 transition-all duration-200 placeholder:text-slate-400;
   }
+
+  /* ── Badges ── */
   .badge {
-    @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full;
+    @apply inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+
+  /* ── Section Headers ── */
+  .section-label {
+    @apply text-brand-500 text-xs font-bold tracking-[0.2em] uppercase;
+  }
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-slate-900 mt-3 leading-tight;
   }
 }
 
-/* Scrollbar */
+/* ── Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Page transition */
+/* ── Page Transition ── */
 .page-enter {
-  animation: fadeUp 0.3s ease-out;
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Skeleton Loading ── */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Image Zoom ── */
+.img-zoom {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .img-zoom {
+  transform: scale(1.08);
+}
+
+/* ── Gradient Text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
