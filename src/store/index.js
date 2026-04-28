@@ -267,27 +267,12 @@ export const useAuthStore = create(
               initialized: true,
             });
           } else {
-            set({ initialized: true });
+            set({ user: null, isAdmin: false, initialized: true });
           }
 
-          // Listen for auth changes
-          supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session?.user) {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-
-              set({
-                user: {
-                  id: session.user.id,
-                  email: session.user.email,
-                  name: profile?.name || session.user.email?.split('@')[0],
-                },
-                isAdmin: profile?.role === 'admin',
-              });
-            } else if (event === 'SIGNED_OUT') {
+          // Listen for auth changes (only SIGNED_OUT matters here)
+          supabase.auth.onAuthStateChange((event) => {
+            if (event === 'SIGNED_OUT') {
               set({ user: null, isAdmin: false });
             }
           });
@@ -405,7 +390,11 @@ export const useAuthStore = create(
       logout: async () => {
         set({ user: null, isAdmin: false });
         if (isSupabaseConfigured && supabase) {
-          supabase.auth.signOut().catch(() => {});
+          try {
+            await supabase.auth.signOut();
+          } catch (e) {
+            // ignore
+          }
         }
       },
 
