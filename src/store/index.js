@@ -311,20 +311,19 @@ export const useAuthStore = create(
           set({ loading: false });
 
           if (error) {
+            // Clear message for duplicate email
+            if (error.message?.includes('already') || error.message?.includes('exists') || error.status === 422) {
+              return { success: false, message: 'This email is already registered. Please sign in instead.' };
+            }
             return { success: false, message: error.message };
           }
 
-          if (data.user) {
-            set({
-              user: {
-                id: data.user.id,
-                email: data.user.email,
-                name: name,
-              },
-              isAdmin: false,
-            });
-            return { success: true, message: "Account created successfully" };
+          // Supabase returns user with identities=[] for existing emails (security)
+          if (data.user && data.user.identities && data.user.identities.length === 0) {
+            return { success: false, message: 'This email is already registered. Please sign in instead.' };
           }
+
+          // Don't set user state — they need to confirm email first
           return { success: true, message: "Check your email for confirmation" };
         }
 
@@ -340,34 +339,48 @@ export const useAuthStore = create(
       login: async (email, password) => {
         if (isSupabaseConfigured && supabase) {
           set({ loading: true });
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
+
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
+
+            if (error) {
+              set({ loading: false });
+              if (error.message?.includes('Email not confirmed')) {
+                return { success: false, message: 'Please confirm your email first. Check your inbox.' };
+              }
+              return { success: false, message: 'Invalid email or password.' };
+            }
+
+            if (data.user) {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', data.user.id)
+                .single();
+
+              const isAdmin = profile?.role === 'admin';
+
+              set({
+                user: {
+                  id: data.user.id,
+                  email: data.user.email,
+                  name: profile?.name || data.user.email?.split('@')[0],
+                },
+                isAdmin,
+                loading: false,
+              });
+              return { success: true, isAdmin, message: "Login successful" };
+            }
+          } catch (err) {
+            set({ loading: false });
+            return { success: false, message: 'Connection error. Please try again.' };
+          }
 
           set({ loading: false });
-
-          if (error) {
-            return { success: false, message: error.message };
-          }
-
-          if (data.user) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', data.user.id)
-              .single();
-
-            set({
-              user: {
-                id: data.user.id,
-                email: data.user.email,
-                name: profile?.name || data.user.email?.split('@')[0],
-              },
-              isAdmin: profile?.role === 'admin',
-            });
-            return { success: true, message: "Login successful" };
-          }
+          return { success: false, message: 'Login failed. Please try again.' };
         }
 
         // Fallback — demo mode

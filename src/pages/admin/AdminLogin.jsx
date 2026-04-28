@@ -22,13 +22,14 @@ export default function AdminLogin() {
 
     const result = await login(email, password);
     if (result.success) {
-      // Check if the logged-in user has admin role
+      // Re-read the store after login to get the latest isAdmin value
       const currentState = useAuthStore.getState();
       if (currentState.isAdmin) {
-        navigate("/admin");
+        navigate("/admin", { replace: true });
       } else {
         setError("Access Denied: This portal is for administrators only.");
-        await currentState.logout();
+        // Logout the non-admin user from admin portal
+        currentState.logout();
       }
     } else {
       setError(result.message || "Invalid email or password.");
