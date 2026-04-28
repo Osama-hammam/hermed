@@ -390,10 +390,10 @@ export const useAuthStore = create(
 
       // Logout
       logout: async () => {
-        if (isSupabaseConfigured && supabase) {
-          await supabase.auth.signOut();
-        }
         set({ user: null, isAdmin: false });
+        if (isSupabaseConfigured && supabase) {
+          supabase.auth.signOut().catch(() => {});
+        }
       },
 
       // Place order

@@ -75,14 +75,14 @@ export default function Account() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-card p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   <UserIcon className="w-6 h-6 text-brand-600" />
                 </div>
-                <div>
-                  <div className="font-semibold text-slate-800">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-slate-800 truncate">
                     {user.name}
                   </div>
-                  <div className="text-sm text-slate-500">{user.email}</div>
+                  <div className="text-sm text-slate-500 truncate">{user.email}</div>
                 </div>
               </div>
 

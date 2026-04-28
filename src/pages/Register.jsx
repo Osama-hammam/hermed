@@ -14,6 +14,7 @@ export default function Register() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const register = useAuthStore((s) => s.register);
   const navigate = useNavigate();
 
@@ -49,7 +50,7 @@ export default function Register() {
     });
 
     if (result.success) {
-      navigate("/login");
+      setSuccess(true);
     } else {
       setError(result.message);
     }
@@ -63,6 +64,31 @@ export default function Register() {
         ref={contentRef}
         className={`bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 transition-all duration-1000 ${contentVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-20 scale-95"}`}
       >
+        {/* Success Message */}
+        {success ? (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Check Your Email!</h2>
+            <p className="text-slate-500 text-sm mb-2">
+              We've sent a confirmation link to:
+            </p>
+            <p className="text-brand-600 font-semibold mb-6">{formData.email}</p>
+            <p className="text-slate-400 text-xs mb-6 leading-relaxed">
+              Please click the link in the email to verify your account.<br/>If you don't see it, check your spam folder.
+            </p>
+            <Link
+              to="/login"
+              className="btn-primary inline-block text-center px-8 py-3"
+            >
+              Go to Sign In
+            </Link>
+          </div>
+        ) : (
+          <>
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3 mb-4">
@@ -182,6 +208,8 @@ export default function Register() {
             Get 15% off your first order with code <strong>HERMED15</strong>
           </p>
         </div>
+          </>
+        )}
       </div>
     </div>
   );
