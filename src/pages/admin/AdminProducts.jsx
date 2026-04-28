@@ -15,7 +15,7 @@ const EMPTY_FORM = {
   category: "handpieces",
   price: "",
   originalPrice: "",
-  image: "",
+  images: [],
   description: "",
   badge: "",
   inStock: true,
@@ -107,12 +107,13 @@ export default function AdminProducts() {
     setShowForm(true);
   };
   const openEdit = (p) => {
+    const existingImages = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
     setForm({
       name: p.name,
       category: p.category,
       price: p.price,
       originalPrice: p.originalPrice || "",
-      image: p.image,
+      images: existingImages,
       description: p.description,
       badge: p.badge || "",
       inStock: p.inStock,
@@ -124,60 +125,84 @@ export default function AdminProducts() {
     setShowForm(true);
   };
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const [uploading, setUploading] = useState(false);
 
-    // If Supabase is configured, upload to storage
-    if (isSupabaseConfigured && supabase) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const { data, error } = await supabase.storage
-        .from('products')
-        .upload(fileName, file, { upsert: true });
-      
-      if (!error) {
-        const { data: { publicUrl } } = supabase.storage
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setUploading(true);
+
+    const newImages = [];
+
+    for (const file of files) {
+      // If Supabase is configured, upload to storage
+      if (isSupabaseConfigured && supabase) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+        const { error } = await supabase.storage
           .from('products')
-          .getPublicUrl(fileName);
-        setForm((prev) => ({ ...prev, image: publicUrl }));
-        toast.success('Image uploaded');
-        return;
+          .upload(fileName, file, { upsert: true });
+
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('products')
+            .getPublicUrl(fileName);
+          newImages.push(publicUrl);
+        }
+      } else {
+        // Fallback: use base64
+        const url = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              const MAX = 800;
+              let w = img.width, h = img.height;
+              if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+              else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+              canvas.width = w; canvas.height = h;
+              canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+              resolve(canvas.toDataURL("image/jpeg", 0.6));
+            };
+          };
+        });
+        newImages.push(url);
       }
     }
 
-    // Fallback: use base64
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
-        let width = img.width;
-        let height = img.height;
-        if (width > height) {
-          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-        } else {
-          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
-        setForm((prev) => ({ ...prev, image: dataUrl }));
-      };
-    };
+    setForm((prev) => ({ ...prev, images: [...prev.images, ...newImages] }));
+    if (newImages.length > 0) toast.success(`${newImages.length} image${newImages.length > 1 ? 's' : ''} uploaded`);
+    setUploading(false);
+    // Reset input
+    e.target.value = '';
+  };
+
+  const removeImage = (index) => {
+    setForm((prev) => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+  };
+
+  const moveImage = (from, to) => {
+    setForm((prev) => {
+      const imgs = [...prev.images];
+      const [moved] = imgs.splice(from, 1);
+      imgs.splice(to, 0, moved);
+      return { ...prev, images: imgs };
+    });
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.price || !form.image) return;
+    if (!form.name || !form.price || form.images.length === 0) {
+      toast.error('Please fill in name, price, and add at least one image');
+      return;
+    }
 
     const data = {
       ...form,
+      image: form.images[0],
+      images: form.images,
       price: parseFloat(form.price),
       stockCount: Math.max(0, parseInt(form.stockCount, 10) || 0),
       originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
@@ -489,55 +514,88 @@ export default function AdminProducts() {
                 />
 
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-slate-600 mb-1.5">
-                    Product Image *
+                  <label className="block text-xs font-medium text-slate-600 mb-2">
+                    Product Images * <span className="text-slate-400 font-normal">(First image = main image. You can upload multiple.)</span>
                   </label>
-                  {form.image ? (
-                    <div className="relative group w-full aspect-video rounded-xl overflow-hidden bg-slate-50 border-2 border-dashed border-slate-200">
-                      <img
-                        src={form.image}
-                        alt="Preview"
-                        className="w-full h-full object-contain"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                        <label className="cursor-pointer bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-50 transition-colors">
-                          Change Image
-                          <input
-                            type="file"
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                          />
-                        </label>
-                        <button
-                          onClick={() => setForm({ ...form, image: "" })}
-                          className="bg-red-500 text-white p-1.5 rounded-lg hover:bg-red-600 transition-colors"
-                        >
-                          <XMarkIcon className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center w-full aspect-video rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-brand-300 cursor-pointer transition-all group">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <div className="p-3 bg-white rounded-xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                          <ArrowUpTrayIcon className="w-6 h-6 text-brand-500" />
+
+                  {/* Image Gallery */}
+                  {form.images.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-3">
+                      {form.images.map((img, idx) => (
+                        <div key={idx} className="relative group rounded-xl overflow-hidden bg-slate-50 border-2 border-slate-200 aspect-square">
+                          <img src={img} alt={`Product ${idx + 1}`} className="w-full h-full object-cover" />
+                          {idx === 0 && (
+                            <span className="absolute top-1.5 left-1.5 bg-brand-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md">MAIN</span>
+                          )}
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                            {idx > 0 && (
+                              <button
+                                onClick={() => moveImage(idx, 0)}
+                                className="bg-white text-slate-800 p-1.5 rounded-lg text-xs hover:bg-brand-50 transition-colors" title="Set as main"
+                              >
+                                ⭐
+                              </button>
+                            )}
+                            {idx > 0 && (
+                              <button
+                                onClick={() => moveImage(idx, idx - 1)}
+                                className="bg-white text-slate-800 p-1.5 rounded-lg text-xs hover:bg-brand-50 transition-colors" title="Move left"
+                              >
+                                ←
+                              </button>
+                            )}
+                            {idx < form.images.length - 1 && (
+                              <button
+                                onClick={() => moveImage(idx, idx + 1)}
+                                className="bg-white text-slate-800 p-1.5 rounded-lg text-xs hover:bg-brand-50 transition-colors" title="Move right"
+                              >
+                                →
+                              </button>
+                            )}
+                            <button
+                              onClick={() => removeImage(idx)}
+                              className="bg-red-500 text-white p-1.5 rounded-lg hover:bg-red-600 transition-colors" title="Remove"
+                            >
+                              <XMarkIcon className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        <p className="text-sm font-semibold text-slate-700">
-                          Click to upload product image
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          PNG, JPG or WEBP (Max. 2MB)
-                        </p>
-                      </div>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                      />
-                    </label>
+                      ))}
+                    </div>
                   )}
+
+                  {/* Upload Area */}
+                  <label className={`flex flex-col items-center justify-center w-full rounded-xl border-2 border-dashed cursor-pointer transition-all group ${
+                    form.images.length > 0 
+                      ? 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-brand-300 py-4'
+                      : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-brand-300 aspect-video'
+                  } ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <div className="flex flex-col items-center justify-center">
+                      {uploading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-600 mb-2"></div>
+                          <p className="text-sm font-medium text-slate-500">Uploading...</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="p-3 bg-white rounded-xl shadow-sm mb-2 group-hover:scale-110 transition-transform">
+                            <ArrowUpTrayIcon className="w-6 h-6 text-brand-500" />
+                          </div>
+                          <p className="text-sm font-semibold text-slate-700">
+                            {form.images.length > 0 ? 'Add more images' : 'Click to upload product images'}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">PNG, JPG or WEBP · Select multiple files</p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                  </label>
                 </div>
 
                 <FormField
@@ -577,7 +635,7 @@ export default function AdminProducts() {
               <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
                 <button
                   onClick={handleSave}
-                  disabled={!form.name || !form.price || !form.image}
+                  disabled={!form.name || !form.price || form.images.length === 0}
                   className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {editId ? "Save Changes" : "Add Product"}
