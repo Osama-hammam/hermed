@@ -110,17 +110,23 @@ export const useProductStore = create((set, get) => ({
 
   fetchProducts: async () => {
     if (get().loading) return;
+
+    // Cache: skip if fetched within last 5 minutes
+    const lastFetch = get()._lastFetch;
+    if (lastFetch && Date.now() - lastFetch < 5 * 60 * 1000 && get().products.length > 0) {
+      return;
+    }
+
     set({ loading: true });
 
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('*')
+          .select('id,slug,name,category_id,price,original_price,rating,reviews,badge,image,images,description,features,in_stock,stock_count,sku')
           .order('created_at', { ascending: false });
 
         if (!error && data && data.length > 0) {
-          // Map Supabase fields to app fields
           const mapped = data.map(p => ({
             id: p.id,
             slug: p.slug,
@@ -139,7 +145,7 @@ export const useProductStore = create((set, get) => ({
             stockCount: p.stock_count,
             sku: p.sku,
           }));
-          set({ products: mapped, loading: false, initialized: true });
+          set({ products: mapped, loading: false, initialized: true, _lastFetch: Date.now() });
           return;
         }
       } catch (err) {
@@ -148,7 +154,7 @@ export const useProductStore = create((set, get) => ({
     }
 
     // Fallback to local data
-    set({ products: fallbackProducts, loading: false, initialized: true });
+    set({ products: fallbackProducts, loading: false, initialized: true, _lastFetch: Date.now() });
   },
 
   addProduct: async (product) => {

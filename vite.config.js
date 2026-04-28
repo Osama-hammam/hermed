@@ -6,12 +6,14 @@ export default defineConfig({
   build: {
     target: 'es2020',
     chunkSizeWarningLimit: 500,
+    cssMinify: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/@supabase')) return 'supabase';
           if (id.includes('node_modules/react-router') || id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) return 'vendor';
           if (id.includes('node_modules/zustand')) return 'state';
+          if (id.includes('node_modules/@heroicons')) return 'icons';
         },
       },
     },

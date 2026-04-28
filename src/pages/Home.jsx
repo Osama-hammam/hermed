@@ -32,9 +32,9 @@ const categoryIcons = {
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [
-    "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80",
-    "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1600&q=80",
-    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1600&q=80",
+    "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=60",
+    "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&q=60",
+    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=60",
   ];
 
   useEffect(() => {
@@ -164,8 +164,9 @@ export default function Home() {
             <div className="relative">
               <div className="w-[460px] h-[460px] rounded-3xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=900&q=90"
+                  src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=500&q=75"
                   alt="Dental clinic"
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               </div>
