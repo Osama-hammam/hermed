@@ -7,7 +7,7 @@ import { useScrollAnimation } from "../hooks/useScrollAnimation";
 export default function Account() {
   const [contentRef, contentVisible] = useScrollAnimation();
 
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAdmin } = useAuthStore();
   const fetchUserOrders = useAuthStore((s) => s.fetchUserOrders);
   const [activeTab, setActiveTab] = useState("profile");
   const [orders, setOrders] = useState([]);
@@ -108,6 +108,20 @@ export default function Account() {
                   Order History
                 </button>
               </nav>
+
+              {isAdmin && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  <Link
+                    to="/admin"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                    </svg>
+                    Admin Dashboard
+                  </Link>
+                </div>
+              )}
 
               <div className="mt-6 pt-6 border-t border-slate-100">
                 <button

@@ -28,6 +28,7 @@ export default function Navbar() {
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const isLoggedIn = !!user;
   const navigate = useNavigate();
 
@@ -192,6 +193,14 @@ export default function Navbar() {
                     >
                       My Account
                     </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="block px-4 py-2 text-sm text-brand-600 hover:bg-brand-50 font-medium"
+                      >
+                        ⚙️ Admin Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
