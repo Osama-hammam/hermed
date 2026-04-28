@@ -395,6 +395,9 @@ export const useAuthStore = create(
       // Logout
       logout: async () => {
         set({ user: null, isAdmin: false });
+        // Clear cart and wishlist
+        useCartStore.getState().clearCart();
+        useWishlistStore.setState({ items: [] });
         if (isSupabaseConfigured && supabase) {
           try {
             await supabase.auth.signOut();
