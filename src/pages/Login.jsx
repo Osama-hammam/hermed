@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store";
-import { EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -22,192 +22,136 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     const result = await login(formData.email, formData.password);
-
     if (result.success) {
       navigate(from, { replace: true });
     } else {
       setError(result.message);
     }
-
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-brand-900 items-center justify-center overflow-hidden">
-        {/* Animated background shapes */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 -left-20 w-[400px] h-[400px] bg-brand-600/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 -right-20 w-[350px] h-[350px] bg-brand-400/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-3xl" />
-        </div>
+      {/* Left — Branding */}
+      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 items-center justify-center p-12">
+        {/* Subtle glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-[100px]" />
 
-        {/* Dot pattern */}
-        <div className="absolute inset-0 opacity-[0.07]">
-          <svg width="100%" height="100%"><defs><pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="1" fill="white" /></pattern></defs><rect width="100%" height="100%" fill="url(#dots)" /></svg>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 text-center px-12 max-w-lg">
-          <div className="mb-8">
-            <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 border border-white/20">
-              <img
-                src="/hermed.jpeg"
-                alt="HERMED"
-                className="h-12 w-auto object-contain"
-                onError={(e) => (e.target.src = "https://ui-avatars.com/api/?name=H&background=1d4ed8&color=fff&size=48")}
-              />
+        <div className="relative z-10 max-w-sm">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-12">
+            <div className="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center border border-white/10">
+              <img src="/hermed.jpeg" alt="" className="h-7 w-auto object-contain"
+                onError={(e) => (e.target.src = "https://ui-avatars.com/api/?name=H&background=6366f1&color=fff&size=28")} />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-3">Welcome to HERMED</h2>
-            <p className="text-brand-200/80 leading-relaxed">
-              Your trusted partner for premium dental instruments, equipment, and supplies.
-            </p>
+            <span className="text-white/90 font-bold text-lg tracking-tight">HERMED</span>
           </div>
 
-          {/* Feature bullets */}
-          <div className="space-y-4 text-left">
-            {[
-              { icon: "🏥", title: "2,000+ Clinics", desc: "Trusted by dental professionals" },
-              { icon: "✨", title: "Premium Quality", desc: "FDA & CE certified products" },
-              { icon: "🚚", title: "Fast Delivery", desc: "Same-day dispatch available" },
-            ].map((item) => (
-              <div key={item.title} className="flex items-center gap-4 bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                <span className="text-2xl">{item.icon}</span>
-                <div>
-                  <div className="text-white font-semibold text-sm">{item.title}</div>
-                  <div className="text-brand-200/60 text-xs">{item.desc}</div>
-                </div>
-              </div>
-            ))}
+          <h2 className="text-4xl font-bold text-white leading-tight mb-4">
+            Professional dental<br />supplies, delivered.
+          </h2>
+          <p className="text-brand-300/70 text-sm leading-relaxed mb-10">
+            Trusted by thousands of dental professionals across Egypt. Premium quality instruments at competitive prices.
+          </p>
+
+          {/* Testimonial-style card */}
+          <div className="bg-white/[0.06] backdrop-blur-sm rounded-2xl p-5 border border-white/[0.08]">
+            <div className="flex gap-1 mb-3">
+              {[1,2,3,4,5].map(i => (
+                <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <p className="text-white/70 text-sm leading-relaxed mb-3">
+              "HERMED has been our go-to supplier for 3 years. Quality products and fast delivery every time."
+            </p>
+            <div className="text-xs text-brand-300/50">— Dr. Ahmed, Cairo Dental Clinic</div>
           </div>
         </div>
       </div>
 
-      {/* Right Panel — Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 sm:px-12 py-12 bg-white">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <Link to="/" className="inline-block">
-              <img
-                src="/hermed.jpeg"
-                alt="HERMED"
-                className="h-12 w-auto object-contain mx-auto"
-                onError={(e) => (e.target.src = "https://ui-avatars.com/api/?name=HERMED&background=1d4ed8&color=fff")}
-              />
-            </Link>
+      {/* Right — Form */}
+      <div className="w-full lg:w-[55%] flex items-center justify-center px-6 sm:px-16 py-12 bg-white">
+        <div className="w-full max-w-[400px]">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-2.5 mb-10">
+            <img src="/hermed.jpeg" alt="HERMED" className="h-9 w-auto object-contain"
+              onError={(e) => (e.target.src = "https://ui-avatars.com/api/?name=HERMED&background=6366f1&color=fff")} />
+            <span className="font-bold text-slate-900 text-lg">HERMED</span>
           </div>
 
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-              Sign in to your account
-            </h1>
-            <p className="text-slate-400">
-              Enter your credentials to access your dashboard
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h1>
+          <p className="text-slate-400 text-sm mb-8">Sign in to continue to your account</p>
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl p-3.5 mb-6 flex items-center gap-2.5 animate-shake">
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 8v4m0 4h.01" />
-              </svg>
+            <div className="bg-red-50 text-red-600 text-sm rounded-xl px-4 py-3 mb-6 border border-red-100">
               {error}
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <EnvelopeIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your@email.com"
-                  className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition-all"
-                  required
-                />
-              </div>
+              <label className="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder:text-slate-300"
+                required
+              />
             </div>
 
-            {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-slate-600 mb-1.5">Password</label>
               <div className="relative">
-                <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition-all"
+                  className="w-full px-4 py-3 pr-11 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder:text-slate-300"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                  {showPassword ? <EyeSlashIcon className="w-4.5 h-4.5" /> : <EyeIcon className="w-4.5 h-4.5" />}
                 </button>
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 transition-all duration-300 shadow-lg shadow-brand-500/25 hover:shadow-xl hover:shadow-brand-500/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl font-semibold text-white bg-brand-600 hover:bg-brand-700 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
-                <>
-                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                  Signing in…
+                </span>
+              ) : "Sign In"}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="my-8 flex items-center gap-4">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-xs text-slate-400 font-medium">New here?</span>
-            <div className="flex-1 h-px bg-slate-200" />
-          </div>
+          <p className="text-center text-sm text-slate-400 mt-8">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-brand-600 hover:text-brand-700 font-semibold">
+              Sign up
+            </Link>
+          </p>
 
-          {/* Register Link */}
-          <Link
-            to="/register"
-            className="block w-full py-3 rounded-xl font-semibold text-center text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-100 transition-all duration-300"
-          >
-            Create an Account
-          </Link>
-
-          {/* Back to home */}
-          <p className="text-center mt-6">
-            <Link to="/" className="text-sm text-slate-400 hover:text-brand-600 transition-colors">
-              ← Back to Home
+          <p className="text-center mt-4">
+            <Link to="/" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+              ← Back to store
             </Link>
           </p>
         </div>
