@@ -58,7 +58,7 @@ export default function Home() {
       {/* ── HERO ── */}
       <section
         ref={heroRef}
-        className={`relative min-h-[88vh] flex items-center overflow-hidden bg-brand-900 ${heroVisible ? "animate-fade-in-up" : "opacity-0"}`}
+        className={`relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-[88vh] flex items-center overflow-hidden bg-brand-900 ${heroVisible ? "animate-fade-in-up" : "opacity-0"}`}
       >
         {/* Hero Slider Background */}
         {slides.map((slide, idx) => (
@@ -92,7 +92,7 @@ export default function Home() {
         <div className="absolute right-0 top-0 w-[600px] h-[600px] bg-brand-400/20 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4 pointer-events-none" />
         <div className="absolute left-0 bottom-0 w-[400px] h-[400px] bg-accent/10 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4 pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
             <div
               className={`inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-xs font-medium px-3 py-1.5 rounded-full mb-6 border border-white/20 transition-all duration-1000 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -101,13 +101,13 @@ export default function Home() {
               Trusted by 2,000+ dental professionals
             </div>
             <h1
-              className={`font-bold text-4xl md:text-6xl mb-4 whitespace-pre-line text-white leading-snug transition-all duration-1000 delay-100 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 whitespace-pre-line text-white leading-snug transition-all duration-1000 delay-100 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
               Delivering Dental{"\n"}
               <span className="text-brand-200">Excellence</span>
             </h1>
             <p
-              className={`text-brand-100/80 text-lg leading-relaxed mb-10 max-w-md transition-all duration-1000 delay-200 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`text-brand-100/80 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10 max-w-md transition-all duration-1000 delay-200 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
               Premium dental instruments, equipment, and supplies for
               professionals who demand the best.
@@ -131,7 +131,7 @@ export default function Home() {
 
             {/* Stats */}
             <div
-              className={`mt-14 flex gap-10 transition-all duration-1000 delay-500 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`mt-10 sm:mt-14 flex gap-6 sm:gap-10 transition-all duration-1000 delay-500 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
               {[
                 ["2,000+", "Clinics Served"],
@@ -139,8 +139,8 @@ export default function Home() {
                 ["15+", "Years Experience"],
               ].map(([n, l]) => (
                 <div key={l}>
-                  <div className="text-2xl font-bold text-white">{n}</div>
-                  <div className="text-xs text-brand-200/70 mt-0.5">{l}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{n}</div>
+                  <div className="text-[10px] sm:text-xs text-brand-200/70 mt-0.5">{l}</div>
                 </div>
               ))}
             </div>

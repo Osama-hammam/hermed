@@ -88,11 +88,11 @@ export default function ProductDetail() {
         <span className="text-slate-600 truncate max-w-xs">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
         {/* ── Image Gallery ── */}
-        <div className="sticky top-28 self-start">
+        <div className="lg:sticky lg:top-28 lg:self-start">
           {/* Main Image */}
-          <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl overflow-hidden aspect-square mb-4 group">
+          <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl lg:rounded-3xl overflow-hidden aspect-square sm:aspect-[4/3] lg:aspect-square mb-3 lg:mb-4 group">
             <img
               src={images[imgIdx]}
               alt={product.name}
@@ -104,14 +104,14 @@ export default function ProductDetail() {
 
             {/* Discount badge */}
             {discount && (
-              <div className="absolute top-4 left-4 bg-rose-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg shadow-rose-500/30">
+              <div className="absolute top-3 left-3 lg:top-4 lg:left-4 bg-rose-500 text-white text-[10px] lg:text-xs font-bold px-2.5 lg:px-3 py-1 lg:py-1.5 rounded-lg lg:rounded-xl shadow-lg shadow-rose-500/30">
                 -{discount}% OFF
               </div>
             )}
 
             {/* Image counter */}
             {images.length > 1 && (
-              <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-lg">
+              <div className="absolute bottom-3 right-3 lg:bottom-4 lg:right-4 bg-black/50 backdrop-blur-sm text-white text-[10px] lg:text-xs font-medium px-2.5 lg:px-3 py-1 lg:py-1.5 rounded-lg">
                 {imgIdx + 1} / {images.length}
               </div>
             )}
@@ -119,12 +119,12 @@ export default function ProductDetail() {
 
           {/* Thumbnails */}
           {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
               {images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setImgIdx(idx)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                  className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-lg lg:rounded-xl overflow-hidden border-2 transition-all duration-300 ${
                     imgIdx === idx
                       ? "border-brand-500 shadow-lg shadow-brand-500/20 scale-105"
                       : "border-transparent opacity-60 hover:opacity-100 hover:border-slate-200"
@@ -156,7 +156,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 lg:mb-4 leading-tight">
             {product.name}
           </h1>
 
@@ -177,13 +177,13 @@ export default function ProductDetail() {
           </div>
 
           {/* Price */}
-          <div className="flex items-baseline gap-3 mb-6 pb-6 border-b border-slate-100">
-            <span className="text-4xl font-bold text-slate-900">
+          <div className="flex items-baseline gap-2 sm:gap-3 mb-5 lg:mb-6 pb-5 lg:pb-6 border-b border-slate-100 flex-wrap">
+            <span className="text-3xl sm:text-4xl font-bold text-slate-900">
               EGP {product.price.toFixed(2)}
             </span>
             {product.originalPrice && (
               <>
-                <span className="text-xl text-slate-400 line-through">
+                <span className="text-base sm:text-xl text-slate-400 line-through">
                   EGP {product.originalPrice.toFixed(2)}
                 </span>
                 <span className="badge bg-rose-100 text-rose-600 font-bold">
@@ -226,22 +226,22 @@ export default function ProductDetail() {
 
           {/* Add to Cart / Out of Stock */}
           {product.inStock && product.stockCount > 0 ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
                 {/* Quantity Selector */}
                 <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-white">
                   <button
                     onClick={() => setQty(Math.max(1, qty - 1))}
-                    className="w-11 h-12 text-slate-500 hover:bg-slate-50 transition-colors font-bold text-lg"
+                    className="w-10 h-11 sm:w-11 sm:h-12 text-slate-500 hover:bg-slate-50 transition-colors font-bold text-lg"
                   >
                     −
                   </button>
-                  <span className="w-12 text-center font-bold text-slate-800 text-sm">
+                  <span className="w-10 sm:w-12 text-center font-bold text-slate-800 text-sm">
                     {qty}
                   </span>
                   <button
                     onClick={() => setQty(Math.min(product.stockCount, qty + 1))}
-                    className="w-11 h-12 text-slate-500 hover:bg-slate-50 transition-colors font-bold text-lg"
+                    className="w-10 h-11 sm:w-11 sm:h-12 text-slate-500 hover:bg-slate-50 transition-colors font-bold text-lg"
                   >
                     +
                   </button>
@@ -250,19 +250,19 @@ export default function ProductDetail() {
                 {/* Add to Cart */}
                 <button
                   onClick={handleAddToCart}
-                  className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 text-base shadow-sm flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-3 sm:py-3.5 rounded-xl font-bold transition-all duration-300 text-sm sm:text-base shadow-sm flex items-center justify-center gap-2 ${
                     added
                       ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
                       : "bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 text-white hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.98]"
                   }`}
                 >
-                  {added ? "✓ Added to Cart!" : "Add to Cart"}
+                  {added ? "✓ Added!" : "Add to Cart"}
                 </button>
 
                 {/* Wishlist */}
                 <button
                   onClick={() => toggleWishlist(product)}
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
                     isWishlisted
                       ? "bg-brand-600 text-white shadow-lg shadow-brand-600/25"
                       : "border border-slate-200 text-slate-400 hover:text-brand-600 hover:border-brand-200"
@@ -291,16 +291,16 @@ export default function ProductDetail() {
           )}
 
           {/* Trust Badges */}
-          <div className="mt-8 grid grid-cols-3 gap-4">
+          <div className="mt-6 lg:mt-8 grid grid-cols-3 gap-2 sm:gap-4">
             {[
               { icon: TruckIcon, label: "Free Shipping", sub: "Over EGP 300" },
               { icon: ArrowPathIcon, label: "Easy Returns", sub: "30-day policy" },
-              { icon: ShieldCheckIcon, label: "Warranty", sub: "Certified products" },
+              { icon: ShieldCheckIcon, label: "Warranty", sub: "Certified" },
             ].map((badge) => (
-              <div key={badge.label} className="text-center p-3 rounded-xl bg-slate-50">
-                <badge.icon className="w-5 h-5 text-brand-500 mx-auto mb-1.5" />
-                <div className="text-xs font-bold text-slate-700">{badge.label}</div>
-                <div className="text-[10px] text-slate-400">{badge.sub}</div>
+              <div key={badge.label} className="text-center p-2.5 sm:p-3 rounded-xl bg-slate-50">
+                <badge.icon className="w-4 h-4 sm:w-5 sm:h-5 text-brand-500 mx-auto mb-1" />
+                <div className="text-[10px] sm:text-xs font-bold text-slate-700 leading-tight">{badge.label}</div>
+                <div className="text-[9px] sm:text-[10px] text-slate-400 hidden sm:block">{badge.sub}</div>
               </div>
             ))}
           </div>
