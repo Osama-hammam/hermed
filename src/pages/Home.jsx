@@ -110,7 +110,7 @@ export default function Home() {
               className={`text-brand-100/80 text-lg leading-relaxed mb-10 max-w-md transition-all duration-1000 delay-200 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
               Premium dental instruments, equipment, and supplies for
-              professionals who demand the best
+              professionals who demand the best.
             </p>
             <div
               className={`flex flex-wrap gap-4 transition-all duration-1000 delay-300 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
