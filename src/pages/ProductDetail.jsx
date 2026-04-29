@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import ProductCard from "../components/ProductCard";
+import ImageLightbox from "../components/ImageLightbox";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 export default function ProductDetail() {
@@ -31,6 +32,7 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [imgIdx, setImgIdx] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   if (!product) {
     return (
@@ -69,6 +71,7 @@ export default function ProductDetail() {
     : null;
 
   return (
+    <>
     <div
       ref={detailRef}
       className={`page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-1000 ${detailVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
@@ -92,7 +95,10 @@ export default function ProductDetail() {
         {/* ── Image Gallery ── */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           {/* Main Image */}
-          <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl lg:rounded-3xl overflow-hidden aspect-square sm:aspect-[4/3] lg:aspect-square mb-3 lg:mb-4 group">
+          <div
+            onClick={() => setLightboxOpen(true)}
+            className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl lg:rounded-3xl overflow-hidden aspect-square sm:aspect-[4/3] lg:aspect-square mb-3 lg:mb-4 group cursor-zoom-in"
+          >
             <img
               src={images[imgIdx]}
               alt={product.name}
@@ -101,6 +107,15 @@ export default function ProductDetail() {
                 e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&background=dbeafe&color=1d4ed8&size=600`;
               }}
             />
+
+            {/* Zoom hint */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 shadow-lg">
+                <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                </svg>
+              </div>
+            </div>
 
             {/* Discount badge */}
             {discount && (
@@ -339,5 +354,15 @@ export default function ProductDetail() {
         </section>
       )}
     </div>
+
+    {/* Lightbox */}
+    {lightboxOpen && (
+      <ImageLightbox
+        images={images}
+        initialIndex={imgIdx}
+        onClose={() => setLightboxOpen(false)}
+      />
+    )}
+    </>
   );
 }
